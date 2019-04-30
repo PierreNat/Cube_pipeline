@@ -11,8 +11,8 @@ def testResnet(model, test_dataloader, loss_function, file_name_extension, devic
     predicted_params = []
     losses = []  # running loss
     count2 = 0
-    f = open("./results/Test_result_{}.txt".format(file_name_extension), "w+")
-    g = open("./results/Test_result_save_param_{}.txt".format(file_name_extension), "w+")
+    f = open("./results/Test_result_{}_Loss.txt".format(file_name_extension), "w+")
+    g = open("./results/Test_result_save_param_{}_Rtvalues.txt".format(file_name_extension), "w+")
     g.write('batch angle (error in degree) translation (error in m)  \r\n')
 
     loop = tqdm.tqdm(test_dataloader)
@@ -35,7 +35,6 @@ def testResnet(model, test_dataloader, loss_function, file_name_extension, devic
             for j in range(0, 6):
                 estim = predicted_param[i][j].detach().cpu().numpy()
                 gt = parameter[i][j].detach().cpu().numpy()
-                # g.write('{:.4f} {:.4f} '.format(estim, gt))
                 if j < 3:
                     g.write('{:.4f}° '.format(np.rad2deg(estim-gt)))
                 else:
