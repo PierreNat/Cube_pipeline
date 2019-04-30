@@ -3,7 +3,6 @@ import torch.nn as nn
 import numpy as np
 import tqdm
 import matplotlib.pyplot as plt
-import sys
 
 from pipeline.utils_functions.render1image import render_1_image
 from pipeline.utils_functions.resnet50 import resnet50
