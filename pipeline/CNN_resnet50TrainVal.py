@@ -17,7 +17,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 torch.cuda.empty_cache()
 print(device)
 
-file_name_extension = '5000rgbRt'  # choose the corresponding database to use
+file_name_extension = '3000rgbnew'  # choose the corresponding database to use
 
 batch_size = 6
 
@@ -32,7 +32,6 @@ parameters_file = 'Npydatabase/params_{}.npy'.format(file_name_extension)
 fileExtension = 'TEST' #string to ad at the end of the file
 
 cubeSetName = 'cubes_{}'.format(file_name_extension) #used to describe the document name
-
 
 date4File = '042819' #mmddyy
 
