@@ -37,6 +37,8 @@ cubeSetName = 'cubes_{}'.format(file_name_extension) #used to describe the docum
 
 date4File = '050119' #mmddyy
 
+obj_name = 'rubik_color'
+
 cubes = np.load(cubes_file)
 sils = np.load(silhouettes_file)
 params = np.load(parameters_file)
@@ -73,29 +75,18 @@ val_dataloader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True, nu
 test_dataloader = DataLoader(test_dataset, batch_size=8, shuffle=False, num_workers=2)
 
 
-for image, sil, param in train_dataloader:
-
-    # print(image[2])
-    print(image.size(), param.size()) #torch.Size([batch, 3, 512, 512]) torch.Size([batch, 6])
-    im =2
-    print(param[im])  # parameter in form tensor([2.5508, 0.0000, 0.0000, 0.0000, 0.0000, 5.0000])
-
-    image2show = image[im]  # indexing random  one image
-    print(image2show.size()) #torch.Size([3, 512, 512])
-    plt.imshow((image2show * 0.5 + 0.5).numpy().transpose(1, 2, 0))
-    plt.show()
-    break  # break here just to show 1 batch of data
-
 #  ------------------------------------------------------------------
 
 
 model = resnet50(cifar=True) #train with the pretrained parameter from cifar database
 model = model.to(device)  # transfer the neural net onto the GPU
-criterion = nn.MSELoss()
+criterion = nn.CrossEntropyLoss()
 
 #  ------------------------------------------------------------------
 
-train_losses, val_losses = train_render(model, train_dataloader, val_dataloader, n_epochs, criterion, date4File, cubeSetName, batch_size, fileExtension, device)
+train_losses, val_losses = train_render(model, train_dataloader, val_dataloader,
+                                        n_epochs, criterion,
+                                        date4File, cubeSetName, batch_size, fileExtension, device, obj_name)
 
 #  ------------------------------------------------------------------
 

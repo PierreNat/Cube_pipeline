@@ -3,8 +3,7 @@ from pipeline.utils_functions.camera_settings import camera_setttings
 import neural_renderer as nr
 
 
-def render_1_image(Obj_Name, params):
-    print("creation of a single image")
+def init(Obj_Name, params):
 
     vertices_1, faces_1, textures_1 = nr.load_obj("./3D_objects/{}.obj".format(Obj_Name), load_texture=True)#, texture_size=4)
     print(vertices_1.shape)
@@ -31,13 +30,26 @@ def render_1_image(Obj_Name, params):
 
     renderer = nr.Renderer(image_size=512, camera_mode='projection', dist_coeffs=None,
                            K=cam.K_vertices, R=cam.R_vertices, t=cam.t_vertices, near=1,
-                           background_color=[255, 255, 255],
+                           background_color=[1,1,1],
                            far=1000, orig_size=512,
                            light_intensity_ambient=1.0, light_intensity_directional=0, light_direction=[0, 1, 0],
                            light_color_ambient=[1, 1, 1], light_color_directional=[1, 1, 1])  # [1,1,1]
 
+    return vertices_1, faces_1, textures_1, renderer
+
+def render_1_image(Obj_Name, params):
+    print("creation of a single image")
+    vertices_1, faces_1, textures_1, renderer = init(Obj_Name,params)
     images_1 = renderer(vertices_1, faces_1, textures_1)  # [batch_size, RGB, image_size, image_size]
     image = images_1[0].detach().cpu().numpy()[0].transpose((1, 2, 0))  # float32 from 0 to 255
-
+    image = (image * 255).astype(np.uint8)  # cast from float32 255.0 to 255 uint8
     return image
 
+def render_1_sil(Obj_Name, params):
+    print("creation of a single image")
+    vertices_1, faces_1, textures_1, renderer = init(Obj_Name,params)
+    sils_1 = renderer(vertices_1, faces_1, textures_1, mode='silhouettes')  # [batch_size, RGB, image_size, image_size]
+    sil = sils_1.detach().cpu().numpy().transpose((1, 2, 0))
+    sil = np.squeeze((sil * 255)).astype(np.uint8)  # change from float 0-1 [512,512,1] to uint8 0-255 [512,512]
+
+    return sil

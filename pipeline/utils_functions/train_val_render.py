@@ -1,9 +1,11 @@
 import numpy as np
 import tqdm
 import torch
+from pipeline.utils_functions.renderBatchImage import renderBatchImage
 
-
-def train_render(model, train_dataloader, val_dataloader, n_epochs, loss_function, date4File, cubeSetName, batch_size, fileExtension, device):
+def train_render(model, train_dataloader, val_dataloader,
+                 n_epochs, loss_function,
+                 date4File, cubeSetName, batch_size, fileExtension, device, obj_name):
     # monitor loss functions as the training progresses
     learning_rate = 0.01
     train_losses = []
@@ -20,7 +22,7 @@ def train_render(model, train_dataloader, val_dataloader, n_epochs, loss_functio
     g.write('batch angle (error in degree) translation (error in m)  \r\n')
     for epoch in range(n_epochs):
 
-        optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
+        optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9) #use SGD with lr update
         f.write('Train, run epoch: {}/{} with Lr {} \r\n'.format(epoch, n_epochs, str(learning_rate)))
         g.write('Train, run epoch: {}/{} with Lr {} \r\n'.format(epoch, n_epochs, str(learning_rate)))
         print('run epoch: {} with Lr {}'.format(epoch, learning_rate))
@@ -36,9 +38,13 @@ def train_render(model, train_dataloader, val_dataloader, n_epochs, loss_functio
 
         for image, silhouette, parameter in loop:
             image = image.to(device)  # we have to send the inputs and targets at every step to the GPU too
+            silhouette = silhouette.to(device)
             parameter = parameter.to(device)
-            predicted_params = model(image)  # run prediction; output <- vector with probabilities of each class
 
+            #image has size [batch_length, 3, 512, 512]
+            predicted_params = model(image)  # run prediction; output <- vector containing  the 6 transformation params
+            np_params = predicted_params.detach().cpu().numpy() #ensor to numpy array
+            rendered_batch_silhouettes = renderBatchImage(Obj_Name=obj_name, predicted_params=np_params)
 
             # zero the parameter gradients
             optimizer.zero_grad()
@@ -112,6 +118,7 @@ def train_render(model, train_dataloader, val_dataloader, n_epochs, loss_functio
         val_epoch_losses.append(np.mean(np.array(losses)))  # global losses array on the way
         print('Mean val loss for epoch {} is {}'.format(epoch, val_epoch_score))
 
+        #Lr update logic
         if val_epoch_score < best_score:   #is the validation batch loss better than previous one?
             torch.save(model.state_dict(), './models/{}_TempModel_Best_train_{}_{}_batchs_epochs_n{}_{}.pth'.format(date4File, cubeSetName, str(batch_size), str(epoch), fileExtension))
             print('parameters saved for epoch {}'.format(epoch))
