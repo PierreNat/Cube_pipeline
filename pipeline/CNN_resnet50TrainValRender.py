@@ -74,6 +74,18 @@ train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True
 val_dataloader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True, num_workers=2)
 test_dataloader = DataLoader(test_dataset, batch_size=8, shuffle=False, num_workers=2)
 
+for image, sil, param in train_dataloader:
+
+    # print(image[2])
+    print(image.size(), sil.size(), param.size()) #torch.Size([batch, 3, 512, 512]) torch.Size([batch, 6])
+    im =2
+    print(param[im])  # parameter in form tensor([2.5508, 0.0000, 0.0000, 0.0000, 0.0000, 5.0000])
+
+    image2show = sil[im]  # indexing random  one image
+    print(image2show.size()) #torch.Size([3, 512, 512])
+    plt.imshow((image2show * 0.5 + 0.5).numpy().transpose(1, 2, 0))
+    plt.show()
+    break  # break here just to show 1 batch of data
 
 #  ------------------------------------------------------------------
 

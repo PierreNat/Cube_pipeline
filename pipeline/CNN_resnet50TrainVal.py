@@ -49,6 +49,9 @@ train_im = cubes[:split]  # 90% training
 train_sil = sils[:split]
 train_param = params[:split]
 
+# plt.imshow(train_sil[0])
+# plt.show()
+
 val_im = cubes[split:]  # remaining ratio for validation
 val_sil = sils[split:]
 val_param = params[split:]
@@ -69,6 +72,11 @@ transforms = Compose([ToTensor(),  normalize])
 train_dataset = CubeDataset(train_im, train_sil, train_param, transforms)
 val_dataset = CubeDataset(val_im, val_sil, val_param, transforms)
 test_dataset = CubeDataset(test_im, test_sil, test_param, transforms)
+
+
+plt.imshow(train_dataset.silhouettes[0])
+plt.show()
+
 
 #  Note:
 #  DataLoader(Dataset,int,bool,int)
