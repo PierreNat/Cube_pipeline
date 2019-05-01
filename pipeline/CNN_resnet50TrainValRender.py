@@ -1,16 +1,17 @@
 
 """
 script to train a resnet 50 network only with n epoch
-Version 4
-plot x y z alpha beta gamma error
-plot render after each epoch
+
+rendering directly after each parameter estimation
 """
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
 import torch.nn as nn
+from torch.utils.data import DataLoader
+from torchvision.transforms import ToTensor, Compose, Normalize, Lambda
 from pipeline.utils_functions.resnet50 import resnet50
-from pipeline.utils_functions.train_val import train
+from pipeline.utils_functions.train_val_render import train_render
 from pipeline.utils_functions.cubeDataset import CubeDataset
 
 # device = torch.device('cpu')
@@ -18,11 +19,11 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 torch.cuda.empty_cache()
 print(device)
 
-file_name_extension = '3000rgbnew'  # choose the corresponding database to use
+file_name_extension = '10000_t'  # choose the corresponding database to use
 
 batch_size = 6
 
-n_epochs = 3
+n_epochs = 4
 
 target_size = (512, 512)
 
@@ -30,11 +31,11 @@ cubes_file = 'Npydatabase/cubes_{}.npy'.format(file_name_extension)
 silhouettes_file = 'Npydatabase/sils_{}.npy'.format(file_name_extension)
 parameters_file = 'Npydatabase/params_{}.npy'.format(file_name_extension)
 
-fileExtension = 'TEST' #string to ad at the end of the file
+fileExtension = 'first_try' #string to ad at the end of the file
 
 cubeSetName = 'cubes_{}'.format(file_name_extension) #used to describe the document name
 
-date4File = '042819' #mmddyy
+date4File = '050119' #mmddyy
 
 cubes = np.load(cubes_file)
 sils = np.load(silhouettes_file)
@@ -59,10 +60,6 @@ test_param = params[:test_length]
 
 #  ------------------------------------------------------------------
 
-from torch.utils.data import DataLoader
-from torchvision.transforms import ToTensor, Compose, Normalize, Lambda
-
-
 normalize = Normalize(mean=[0.5], std=[0.5])
 gray_to_rgb = Lambda(lambda x: x.repeat(3, 1, 1))
 transforms = Compose([ToTensor(),  normalize])
@@ -70,12 +67,6 @@ train_dataset = CubeDataset(train_im, train_sil, train_param, transforms)
 val_dataset = CubeDataset(val_im, val_sil, val_param, transforms)
 test_dataset = CubeDataset(test_im, test_sil, test_param, transforms)
 
-#  Note:
-#  DataLoader(Dataset,int,bool,int)
-#  dataset (Dataset) – dataset from which to load the data.
-#  batch_size (int, optional) – how many samples per batch to load (default: 1)
-#  shuffle (bool, optional) – set to True to have the data reshuffled at every epoch (default: False).
-#  num_workers = n - how many threads in background for efficient loading
 
 train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=2)
 val_dataloader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True, num_workers=2)
@@ -98,13 +89,13 @@ for image, sil, param in train_dataloader:
 #  ------------------------------------------------------------------
 
 
-model = resnet50(cifar=True)
+model = resnet50(cifar=True) #train with the pretrained parameter from cifar database
 model = model.to(device)  # transfer the neural net onto the GPU
 criterion = nn.MSELoss()
 
 #  ------------------------------------------------------------------
 
-train_losses, val_losses = train(model, train_dataloader, val_dataloader, n_epochs, criterion, date4File, cubeSetName, batch_size, fileExtension, device)
+train_losses, val_losses = train_render(model, train_dataloader, val_dataloader, n_epochs, criterion, date4File, cubeSetName, batch_size, fileExtension, device)
 
 #  ------------------------------------------------------------------
 

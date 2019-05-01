@@ -195,7 +195,6 @@ def resnet50(pretrained=True, cifar = True, modelName='None', **kwargs):
             model.load_state_dict(model_state)
             model.eval()
 
-
         else:
             model.load_state_dict(torch.load('models/{}.pth'.format(modelName)))
             model.eval()

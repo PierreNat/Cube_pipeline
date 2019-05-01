@@ -10,7 +10,7 @@ import numpy as np
 import math as m
 import torch
 
-file_name_extension = '3000rgbnew'
+file_name_extension = '10000_t'
 
 cubes = np.load('Npydatabase/cubes_{}.npy'.format(file_name_extension))
 sils = np.load('Npydatabase/sils_{}.npy'.format(file_name_extension))

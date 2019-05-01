@@ -106,7 +106,7 @@ for image, sil, param in test_dataloader:
 #  ------------------------------------------------------------------
 
 
-model = resnet50(cifar=False, modelName=modelName)
+model = resnet50(cifar=False, modelName=modelName) #train with the saved model from the training script
 model = model.to(device)  # transfer the neural net onto the GPU
 criterion = nn.MSELoss()
 
