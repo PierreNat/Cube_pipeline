@@ -85,6 +85,7 @@ class CubeDataset(Dataset):
 
     def __len__(self):
         return len(self.images)  # return the length of the dataset
+
 #  ------------------------------------------------------------------
 
 
@@ -123,7 +124,6 @@ for image, sil, param in train_dataloader:
 
 #  ------------------------------------------------------------------
 
-import torch.optim as optim
 
 model = resnet50(cifar=True)
 model = model.to(device)  # transfer the neural net onto the GPU
