@@ -16,6 +16,7 @@ def limit(param):
     else:
         return param
 
+
 def init(Obj_Name, params):
 
     vertices_1, faces_1, textures_1 = nr.load_obj("./3D_objects/{}.obj".format(Obj_Name), load_texture=True)#, texture_size=4)

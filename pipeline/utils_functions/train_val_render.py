@@ -1,7 +1,7 @@
 import numpy as np
 import tqdm
 import torch
-from pipeline.utils_functions.renderBatchImage import renderBatchImage
+from pipeline.utils_functions.render1item import render_1_sil
 
 def train_render(model, train_dataloader, val_dataloader,
                  n_epochs, loss_function,
@@ -44,7 +44,7 @@ def train_render(model, train_dataloader, val_dataloader,
             #image has size [batch_length, 3, 512, 512]
             predicted_params = model(image)  # run prediction; output <- vector containing  the 6 transformation params
             np_params = predicted_params.detach().cpu().numpy() #ensor to numpy array
-            rendered_batch_silhouettes = renderBatchImage(Obj_Name=obj_name, predicted_params=np_params, device=device)
+            rendered_batch_silhouettes = renderBatchItem(Obj_Name=obj_name, predicted_params=np_params, device=device)
 
             # zero the parameter gradients
             optimizer.zero_grad()

@@ -21,7 +21,8 @@ class CubeDataset(Dataset):
             sel_images = self.transform(sel_images)
             sel_sils = self.transform(sel_sils)
 
-        return sel_images, sel_images, torch.FloatTensor(sel_params)  # return all parameter in tensor form
+        # squeeze transform sil from tensor shape [6,1,512,512] to shape [6, 512, 512]
+        return sel_images, np.squeeze(sel_sils), torch.FloatTensor(sel_params)  # return all parameter in tensor form
 
     def __len__(self):
         return len(self.images)  # return the length of the dataset
