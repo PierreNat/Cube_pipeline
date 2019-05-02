@@ -1,6 +1,8 @@
 import numpy as np
 from pipeline.utils_functions.render1item import render_1_sil, render_1_image
+import torch
 import matplotlib.pyplot as plt
+from torchvision.transforms import ToTensor
 
 
 def renderBatchSil(Obj_Name, predicted_params, device):
@@ -16,7 +18,8 @@ def renderBatchSil(Obj_Name, predicted_params, device):
         batch_silhouettes.extend(sil)
 
     sils_database = np.reshape(batch_silhouettes, (nbrOfParam, 512, 512))  # shape(6, 512, 512) ndarray
-    return sils_database
+    sils_database = torch.from_numpy(sils_database)
+    return sils_database.to(device)
 
 
 def renderBatchImage(Obj_Name, predicted_params, device):

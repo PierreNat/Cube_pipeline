@@ -75,7 +75,6 @@ val_dataloader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True, nu
 test_dataloader = DataLoader(test_dataset, batch_size=8, shuffle=False, num_workers=2)
 
 
-
 # for image, sil, param in train_dataloader:
 #
 # #plot silhouette
@@ -90,7 +89,8 @@ test_dataloader = DataLoader(test_dataset, batch_size=8, shuffle=False, num_work
 #
 #     image2show = sil[im]  # indexing random  one image
 #     print(image2show.size())  # torch.Size([3, 512, 512])
-#     plt.imshow((image2show * 0.5 + 0.5).numpy(), cmap='gray')
+#     image2show = image2show.numpy()
+#     plt.imshow(image2show, cmap='gray')
 #     plt.show()
 #
 #     break  # break here just to show 1 batch of data

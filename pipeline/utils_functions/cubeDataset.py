@@ -19,7 +19,7 @@ class CubeDataset(Dataset):
 
         if self.transform is not None:
             sel_images = self.transform(sel_images)
-            sel_sils = self.transform(sel_sils)
+            sel_sils = torch.from_numpy(sel_sils)
 
         # squeeze transform sil from tensor shape [6,1,512,512] to shape [6, 512, 512]
         return sel_images, np.squeeze(sel_sils), torch.FloatTensor(sel_params)  # return all parameter in tensor form

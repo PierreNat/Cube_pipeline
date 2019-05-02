@@ -1,7 +1,8 @@
 import numpy as np
 import tqdm
 import torch
-from pipeline.utils_functions.render1item import render_1_sil
+from pipeline.utils_functions.renderBatchItem import renderBatchSil
+from pipeline.utils_functions.lossBtwSils import lossBtwSils
 
 def train_render(model, train_dataloader, val_dataloader,
                  n_epochs, loss_function,
@@ -44,12 +45,12 @@ def train_render(model, train_dataloader, val_dataloader,
             #image has size [batch_length, 3, 512, 512]
             predicted_params = model(image)  # run prediction; output <- vector containing  the 6 transformation params
             np_params = predicted_params.detach().cpu().numpy() #ensor to numpy array
-            rendered_batch_silhouettes = renderBatchItem(Obj_Name=obj_name, predicted_params=np_params, device=device)
+            rendered_batch_silhouettes = renderBatchSil(Obj_Name=obj_name, predicted_params=np_params, device=device)
 
             # zero the parameter gradients
             optimizer.zero_grad()
 
-            loss = loss_function(predicted_params, parameter) # MSE  value ?
+            loss = lossBtwSils(silhouette, rendered_batch_silhouettes, loss_function) # loss cross Entropy
             alpha_loss = loss_function(predicted_params[:, 0], parameter[:, 0])
             beta_loss = loss_function(predicted_params[:, 1], parameter[:, 1])
             gamma_loss = loss_function(predicted_params[:, 2], parameter[:, 2])
