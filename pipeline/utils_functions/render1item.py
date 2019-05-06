@@ -12,7 +12,6 @@ def limit(param):
             return low_limit
         else:
             return up_limit
-        return 8
     else:
         return param
 
