@@ -74,7 +74,7 @@ train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True
 val_dataloader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True, num_workers=2)
 test_dataloader = DataLoader(test_dataset, batch_size=8, shuffle=False, num_workers=2)
 
-
+#
 # for image, sil, param in train_dataloader:
 #
 # #plot silhouette

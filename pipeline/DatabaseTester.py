@@ -7,6 +7,7 @@ Created on Mon Apr  1 14:23:31 2019
 """
 import matplotlib.pyplot as plt
 import numpy as np
+import torch.nn as nn
 import math as m
 import torch
 
@@ -30,4 +31,5 @@ for i in range(0,10):
     plt.imshow(sil, cmap='gray')
     plt.show()
     plt.close(fig)
+    criterion = nn.CrossEntropyLoss()
 
