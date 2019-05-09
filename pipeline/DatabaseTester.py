@@ -37,21 +37,20 @@ for i in range(0,10):
     # plt.close(fig)
 
     loss = nn.CrossEntropyLoss()
+    loss2 = nn.BCELoss()
+
+
     # input = torch.randn(10, 4, requires_grad=True)  #torch float 32
-    input = (torch.from_numpy(np.array([[1, 1 , 1 , 1, 1],
-                                        [1, 1 , 1 , 1, 1],
-                                        [1, 1 , 1 , 1, 1],
-                                        [1, 1 , 1 , 1, 1],
-                                        [1, 1 , 1 , 1, 1],
-                                        [1, 1 , 1 , 1, 1]])))
+    input = (torch.from_numpy(np.array([[1, 1, 1, 1, 1 ,0 ,0, 0, 0, 0],
+                                        [1, 1, 1, 1, 1 ,0 ,0, 0, 0, 0]])))
     input = input.double()
     # target = input
     # target = torch.empty(10, dtype=torch.long).random_(5) #torch int 64
-    target = torch.from_numpy(np.array([1, 1 , 1 , 1, 1 ,1 ])) #torch int 64
+    target = torch.from_numpy(np.array([1, 1])) #torch int 64
     target = target.long()
     # input = (torch.from_numpy(np.array([[1,2,3,4,5,6,7,8],[1,2,3,4,5,6,7,8]]))).type(torch.)
     # target = torch.from_numpy(np.array([1,2,3,4,5,6,7,8])).CharTensor
-    output = loss(input, target)
+    output = loss2(input,  input)
     Sil_1d_1 = torch.from_numpy((np.reshape(sil, np.size(sil,0)*np.size(sil,1))/255)).double()#size, [batch = 1, class = 512*512]
 
     Sil_1d_2 = torch.from_numpy(np.reshape(sil2, np.size(sil2,0)*np.size(sil2,1))).long() #size = 512*512 values
@@ -61,4 +60,7 @@ for i in range(0,10):
     #output should be n value
     output = loss(Sil_1d_1, Sil_1d_1) #target should be a 1d tensor with n values, any value
     print('loss computed')
+
+    #faire pour chaque pixel separement?
+    #revoir pytorch cross entropy et appliquer formule et voir les parameter
 
