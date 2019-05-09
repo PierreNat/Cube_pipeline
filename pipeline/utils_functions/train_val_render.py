@@ -51,12 +51,12 @@ def train_render(model, train_dataloader, val_dataloader,
             optimizer.zero_grad()
 
             loss = lossBtwSils(silhouette, rendered_batch_silhouettes, loss_function) # loss cross Entropy
-            alpha_loss = loss_function(predicted_params[:, 0], parameter[:, 0])
-            beta_loss = loss_function(predicted_params[:, 1], parameter[:, 1])
-            gamma_loss = loss_function(predicted_params[:, 2], parameter[:, 2])
-            x_loss = loss_function(predicted_params[:, 3], parameter[:, 3])
-            y_loss = loss_function(predicted_params[:, 4], parameter[:, 4])
-            z_loss = loss_function(predicted_params[:, 5], parameter[:, 5])
+            # alpha_loss = loss_function(predicted_params[:, 0], parameter[:, 0])
+            # beta_loss = loss_function(predicted_params[:, 1], parameter[:, 1])
+            # gamma_loss = loss_function(predicted_params[:, 2], parameter[:, 2])
+            # x_loss = loss_function(predicted_params[:, 3], parameter[:, 3])
+            # y_loss = loss_function(predicted_params[:, 4], parameter[:, 4])
+            # z_loss = loss_function(predicted_params[:, 5], parameter[:, 5])
 
             loss.backward()
             optimizer.step()

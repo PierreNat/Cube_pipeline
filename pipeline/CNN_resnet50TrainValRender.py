@@ -100,8 +100,8 @@ test_dataloader = DataLoader(test_dataset, batch_size=8, shuffle=False, num_work
 
 model = resnet50(cifar=True) #train with the pretrained parameter from cifar database
 model = model.to(device)  # transfer the neural net onto the GPU
-criterion = nn.CrossEntropyLoss()
-
+criterion = nn.BCELoss()  #nn.BCELoss()   #nn.CrossEntropyLoss()
+#
 #  ------------------------------------------------------------------
 
 train_losses, val_losses = train_render(model, train_dataloader, val_dataloader,
