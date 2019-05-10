@@ -17,7 +17,7 @@ def lossBtwSils(GD_Sils,ComputedSils, lossfunction):
     # plt.show()
     # print(gtfloat.max(), gtfloat.min())
     input.requires_grad = True
-    print(input.requires_grad)
+    # print(input.requires_grad)
     temp_loss = lossfunction(input.double(), target.double())
     return temp_loss
 

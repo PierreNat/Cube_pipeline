@@ -7,7 +7,7 @@ def limit(param):
     up_limit = 10
     low_limit = 7
     if param < low_limit or param > up_limit:
-        print('param out of range was restricted')
+        # print('param out of range was restricted')
         if np.abs(param-low_limit) < np.abs(param-low_limit):
             return low_limit
         else:
@@ -19,8 +19,8 @@ def limit(param):
 def init(Obj_Name, params):
 
     vertices_1, faces_1, textures_1 = nr.load_obj("./3D_objects/{}.obj".format(Obj_Name), load_texture=True)#, texture_size=4)
-    print(vertices_1.shape)
-    print(faces_1.shape)
+    # print(vertices_1.shape)
+    # print(faces_1.shape)
     vertices_1 = vertices_1[None, :, :]  # add dimension
     faces_1 = faces_1[None, :, :]  #add dimension
     textures_1 = textures_1[None, :, :]  #add dimension

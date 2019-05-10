@@ -41,7 +41,7 @@ def train(model, train_dataloader, val_dataloader, n_epochs, loss_function, date
 
             # zero the parameter gradients
             optimizer.zero_grad()
-
+            print(predicted_params.requires_grad)
             loss = loss_function(predicted_params, parameter) #MSE  value ?
             alpha_loss = loss_function(predicted_params[:, 0], parameter[:, 0])
             beta_loss = loss_function(predicted_params[:, 1], parameter[:, 1])
