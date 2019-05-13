@@ -8,7 +8,7 @@ def lossBtwSils(GT_Sils,ComputedSils, lossfunction, plot):
     nbrOfSil = np.shape(GT_Sils)[0]
     gt = GT_Sils #selection of ground truth segmentation
     cp = ComputedSils #selection of computed segmentation
-    cp[1] = gt[1] #simulation of a perfect match
+    # cp[1] = gt[1] #simulation of a perfect match
     # plt.imshow(gt.cpu(), cmap='gray')
     # plt.show()
     # print(GD_Sils.max(), GD_Sils.min())
