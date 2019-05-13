@@ -3,7 +3,7 @@ import tqdm
 import torch
 import matplotlib.pyplot as plt
 
-def lossBtwSils(GT_Sils,ComputedSils, lossfunction, plot):
+def lossBtwSils(GT_Sils,ComputedSils, lossfunction, plot=False):
 
     nbrOfSil = np.shape(GT_Sils)[0]
     gt = GT_Sils #selection of ground truth segmentation

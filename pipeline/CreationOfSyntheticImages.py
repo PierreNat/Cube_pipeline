@@ -25,7 +25,7 @@ def main():
     print(vertices_1.shape)
     print(faces_1.shape)
 
-    file_name_extension = '10000_t'
+    file_name_extension = '10000_t_zOnly'
     nb_im = 10000
 
     #init and create renderer object
@@ -45,9 +45,9 @@ def main():
         alpha = 0 #uniform(0, 180)
         beta =  0 #uniform(0, 180)
         gamma = 0 #uniform(0, 180)
-        x = uniform(-2, 2)
-        y = uniform(-2, 2)
-        z = uniform(7, 10)
+        x = 0
+        y = 0
+        z = uniform(4, 14)
         R = np.array([np.radians(alpha), np.radians(beta), np.radians(gamma)])  # angle in degree
         t = np.array([x, y, z])  # translation in meter
 

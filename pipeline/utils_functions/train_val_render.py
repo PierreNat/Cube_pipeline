@@ -8,7 +8,7 @@ def train_render(model, train_dataloader, val_dataloader,
                  n_epochs, loss_function,
                  date4File, cubeSetName, batch_size, fileExtension, device, obj_name):
     # monitor loss functions as the training progresses
-    learning_rate = 0.01
+    learning_rate = 0.001
     train_losses = []
     train_epoch_losses = []
     val_losses = []
@@ -22,10 +22,12 @@ def train_render(model, train_dataloader, val_dataloader,
 
     f = open("./results/{}_{}_{}_batchs_{}_epochs_{}_losses.txt".format(date4File, cubeSetName, str(batch_size), str(n_epochs), fileExtension), "w+")
     g = open("./results/{}_{}_{}_batchs_{}_epochs_{}_Rtvalues.txt".format(date4File, cubeSetName, str(batch_size), str(n_epochs), fileExtension), "w+")
-    g.write('batch angle (error in degree) translation (error in m)  \r\n')
+    g.write('batch computed angle computed ( aby) translation (xyz)  \r\n')
     for epoch in range(n_epochs):
 
         optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9) #use SGD with lr update
+
+
         f.write('Train, run epoch: {}/{} with Lr {} \r\n'.format(epoch, n_epochs, str(learning_rate)))
         g.write('Train, run epoch: {}/{} with Lr {} \r\n'.format(epoch, n_epochs, str(learning_rate)))
         print('run epoch: {} with Lr {}'.format(epoch, learning_rate))
@@ -48,32 +50,26 @@ def train_render(model, train_dataloader, val_dataloader,
             predicted_params = model(image)  # run prediction; output <- vector containing  the 6 transformation params
             np_params = predicted_params.detach().cpu().numpy() #ensor to numpy array
 
-            if count%100 == 0:
+            if count%200 == 0:
                 plot = True
             else:
                 plot = False
 
-            rendered_batch_silhouettes = renderBatchSil(Obj_Name=obj_name, predicted_params=np_params, ground_Truth=parameter.detach().cpu().numpy(), device=device, plot=plot)
+            rendered_batch_silhouettes = renderBatchSil(obj_name, np_params, parameter.detach().cpu().numpy(), device, plot)
 
             # zero the parameter gradients
             optimizer.zero_grad()
 
             loss = lossBtwSils(silhouette, rendered_batch_silhouettes, loss_function, plot) # loss cross Entropy
-            # alpha_loss = loss_function(predicted_params[:, 0], parameter[:, 0])
-            # beta_loss = loss_function(predicted_params[:, 1], parameter[:, 1])
-            # gamma_loss = loss_function(predicted_params[:, 2], parameter[:, 2])
-            # x_loss = loss_function(predicted_params[:, 3], parameter[:, 3])
-            # y_loss = loss_function(predicted_params[:, 4], parameter[:, 4])
-            # z_loss = loss_function(predicted_params[:, 5], parameter[:, 5])
 
-            loss.backward()
-            optimizer.step()
+            loss.backward() # mutiple times accumulates the gradient (by addition) for each parameter
+            optimizer.step() # performs a parameter update based on the current gradient, SGD is used here
 
             parameters.extend(parameter.cpu().numpy())  # append ground truth label
             predict_params.extend(predicted_params.detach().cpu().numpy())  # append computed parameters
             losses.append(loss.item())  # batch length is append every time
 
-            # store value GT(ground truth) and predicted param
+            # store value GT(ground truth) and predicted param differenc
             for i in range(0, predicted_params .shape[0]):
                 g.write('{} '.format(count))
                 for j in range(0, 6):
@@ -81,9 +77,11 @@ def train_render(model, train_dataloader, val_dataloader,
                     gt = parameter[i][j].detach().cpu().numpy()
 
                     if j < 3:
-                        g.write('{:.4f}°'.format(np.rad2deg(estim - gt)))
+                        g.write('{:.4f}°'.format(np.rad2deg(estim)))
+                        # g.write('{:.4f}°'.format(np.rad2deg(estim - gt))) #error in degree
                     else:
-                        g.write('{:.4f} '.format(estim - gt))
+                        g.write('{:.4f} '.format(estim))
+                        # g.write('{:.4f} '.format(estim - gt)) #error in meter
                 g.write('\r\n')
 
             # train_loss = loss
@@ -113,10 +111,15 @@ def train_render(model, train_dataloader, val_dataloader,
             parameter = parameter.to(device)
             predicted_params = model(image)  # run prediction; output <- vector with probabilities of each class
 
+            np_params = predicted_params.detach().cpu().numpy() #ensor to numpy array
+            rendered_batch_silhouettes = renderBatchSil(obj_name, np_params, parameter.detach().cpu().numpy(), device)
+
             # zero the parameter gradients
             optimizer.zero_grad()
 
-            loss = loss_function(predicted_params, parameter) #MSE  value ?
+            loss = lossBtwSils(silhouette, rendered_batch_silhouettes, loss_function, plot) # loss cross Entropy
+
+            # loss = loss_function(predicted_params, parameter) #MSE  value ?
 
             parameters.extend(parameter.cpu().numpy())  # append ground truth label
             losses.append(loss.item())  # running loss
@@ -131,19 +134,19 @@ def train_render(model, train_dataloader, val_dataloader,
         val_epoch_losses.append(np.mean(np.array(losses)))  # global losses array on the way
         print('Mean val loss for epoch {} is {}'.format(epoch, val_epoch_score))
 
-        #Lr update logic
-        if val_epoch_score < best_score:   #is the validation batch loss better than previous one?
-            torch.save(model.state_dict(), './models/{}_TempModel_Best_train_{}_{}_batchs_epochs_n{}_{}.pth'.format(date4File, cubeSetName, str(batch_size), str(epoch), fileExtension))
-            print('parameters saved for epoch {}'.format(epoch))
-
-            noDecreaseCount = 0
-            best_score = val_epoch_score
-        else:                           #the validation batch loss is not better, increase counter
-            noDecreaseCount += 1
-
-        if noDecreaseCount == 5:   #if the validation loss does not deacrease after 5 epochs, lower the learning rate
-            learning_rate /= 10
-            noDecreaseCount = 0
+        # #Lr update logic
+        # if val_epoch_score < best_score:   #is the validation batch loss better than previous one?
+        #     torch.save(model.state_dict(), './models/{}_TempModel_Best_train_{}_{}_batchs_epochs_n{}_{}.pth'.format(date4File, cubeSetName, str(batch_size), str(epoch), fileExtension))
+        #     print('parameters saved for epoch {}'.format(epoch))
+        #
+        #     noDecreaseCount = 0
+        #     best_score = val_epoch_score
+        # else:                           #the validation batch loss is not better, increase counter
+        #     noDecreaseCount += 1
+        #
+        # if noDecreaseCount == 5:   #if the validation loss does not deacrease after 5 epochs, lower the learning rate
+        #     learning_rate /= 10
+        #     noDecreaseCount = 0
 
     f.close()
     g.close()

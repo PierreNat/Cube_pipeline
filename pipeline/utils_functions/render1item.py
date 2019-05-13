@@ -4,8 +4,9 @@ import neural_renderer as nr
 
 
 def limit(param):
-    up_limit = 10
-    low_limit = 7
+    # return param
+    up_limit = 14
+    low_limit = 4
     if param < low_limit or param > up_limit:
         # print('param out of range was restricted')
         if np.abs(param-low_limit) < np.abs(param-low_limit):

@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from torchvision.transforms import ToTensor
 
 
-def renderBatchSil(Obj_Name, predicted_params, ground_Truth, device, plot):
+def renderBatchSil(Obj_Name, predicted_params, ground_Truth, device, plot=False):
     batch_silhouettes = []  # create a void list for the rendered silhouette
     nbrOfParam = np.shape(predicted_params)[0]
     nb_im = nbrOfParam
