@@ -48,7 +48,7 @@ def train_render(model, train_dataloader, val_dataloader,
 
             #image has size [batch_length, 3, 512, 512]
             predicted_params = model(image)  # run prediction; output <- vector containing  the 6 transformation params
-            np_params = predicted_params.detach().cpu().numpy() #ensor to numpy array
+            np_params = predicted_params.detach().cpu().numpy() #ensor to numpy array, ERROR HERE, DOES NOT HAVE GRAD
 
             if count%200 == 0:
                 plot = True
