@@ -5,21 +5,25 @@ import matplotlib.pyplot as plt
 from torchvision.transforms import ToTensor
 
 
-def renderBatchSil(Obj_Name, predicted_params, device):
+def renderBatchSil(Obj_Name, predicted_params, ground_Truth, device, plot):
     batch_silhouettes = []  # create a void list for the rendered silhouette
     nbrOfParam = np.shape(predicted_params)[0]
     nb_im = nbrOfParam
 
     for i in range(0, nbrOfParam):
         # define extrinsic parameter
-        # predicted_params[i] = np.array([0, 0, 0, 2, 0.5*i, 8])
+        # predicted_params[i] = np.array([0, 0, 0, 2, 0.5*i, 8]) #test to enforce defined parameter
         sil = render_1_sil(Obj_Name, predicted_params[i])
-        # plt.imshow(sil, cmap='gray')
-        # plt.show()
-        # plt.close()
+        if plot:
+            sil_GT =  render_1_sil(Obj_Name, ground_Truth[i])
+            # plt.subplot(1, nb_im, i + 1)
+            # plt.imshow(sil, cmap='gray')
 
-        plt.subplot(1, nb_im, i + 1)
-        plt.imshow(sil, cmap='gray')
+            plt.subplot(2, nb_im, i + 1)
+            plt.imshow(sil_GT, cmap='gray')
+
+            plt.subplot(2, nb_im, i + 1 + nb_im)
+            plt.imshow(sil, cmap='gray')
 
 
         batch_silhouettes.extend(sil)

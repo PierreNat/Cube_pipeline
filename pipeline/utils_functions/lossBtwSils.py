@@ -3,10 +3,12 @@ import tqdm
 import torch
 import matplotlib.pyplot as plt
 
-def lossBtwSils(GD_Sils,ComputedSils, lossfunction):
+def lossBtwSils(GT_Sils,ComputedSils, lossfunction, plot):
 
-    gt = GD_Sils #selection of ground truth segmentation
+    nbrOfSil = np.shape(GT_Sils)[0]
+    gt = GT_Sils #selection of ground truth segmentation
     cp = ComputedSils #selection of computed segmentation
+    cp[1] = gt[1] #simulation of a perfect match
     # plt.imshow(gt.cpu(), cmap='gray')
     # plt.show()
     # print(GD_Sils.max(), GD_Sils.min())
@@ -17,8 +19,18 @@ def lossBtwSils(GD_Sils,ComputedSils, lossfunction):
     # plt.show()
     # print(gtfloat.max(), gtfloat.min())
     input.requires_grad = True
+    lossfunction.reduction = 'none'
     # print(input.requires_grad)
     temp_loss = lossfunction(input.double(), target.double())
-    return temp_loss
+    lossfunction.reduction = 'mean'
+    mean_loss = lossfunction(input.double(), target.double())
+
+    if plot:
+        for i in range(0, nbrOfSil):
+            plt.subplot(1, nbrOfSil, i + 1)
+            plt.imshow(temp_loss[i].detach().numpy(), cmap='gray')
+    # plt.imshow(temp_loss[0].detach().numpy(), cmap='gray')
+    plt.show()
+    return mean_loss
 
 

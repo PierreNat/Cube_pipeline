@@ -18,6 +18,8 @@ def train_render(model, train_dataloader, val_dataloader,
     best_score  = 1000
     noDecreaseCount = 0
 
+    plot = False #plot the running renderered batch of image
+
     f = open("./results/{}_{}_{}_batchs_{}_epochs_{}_losses.txt".format(date4File, cubeSetName, str(batch_size), str(n_epochs), fileExtension), "w+")
     g = open("./results/{}_{}_{}_batchs_{}_epochs_{}_Rtvalues.txt".format(date4File, cubeSetName, str(batch_size), str(n_epochs), fileExtension), "w+")
     g.write('batch angle (error in degree) translation (error in m)  \r\n')
@@ -45,12 +47,18 @@ def train_render(model, train_dataloader, val_dataloader,
             #image has size [batch_length, 3, 512, 512]
             predicted_params = model(image)  # run prediction; output <- vector containing  the 6 transformation params
             np_params = predicted_params.detach().cpu().numpy() #ensor to numpy array
-            rendered_batch_silhouettes = renderBatchSil(Obj_Name=obj_name, predicted_params=np_params, device=device)
+
+            if count%100 == 0:
+                plot = True
+            else:
+                plot = False
+
+            rendered_batch_silhouettes = renderBatchSil(Obj_Name=obj_name, predicted_params=np_params, ground_Truth=parameter.detach().cpu().numpy(), device=device, plot=plot)
 
             # zero the parameter gradients
             optimizer.zero_grad()
 
-            loss = lossBtwSils(silhouette, rendered_batch_silhouettes, loss_function) # loss cross Entropy
+            loss = lossBtwSils(silhouette, rendered_batch_silhouettes, loss_function, plot) # loss cross Entropy
             # alpha_loss = loss_function(predicted_params[:, 0], parameter[:, 0])
             # beta_loss = loss_function(predicted_params[:, 1], parameter[:, 1])
             # gamma_loss = loss_function(predicted_params[:, 2], parameter[:, 2])
@@ -78,11 +86,12 @@ def train_render(model, train_dataloader, val_dataloader,
                         g.write('{:.4f} '.format(estim - gt))
                 g.write('\r\n')
 
+            # train_loss = loss
             train_loss = np.mean(np.array(losses))
 
             train_losses.append(train_loss)  # global losses array on the way
-            print('run: {}/{} MSE train loss: {:.4f}, '.format(count, len(loop), train_loss))
-            f.write('run: {}/{} MSE train loss: {:.4f},  \r\n'.format(count, len(loop), train_loss))
+            print('run: {}/{} MSE train loss: {:.4f}, '.format(count, len(loop), loss))
+            f.write('run: {}/{} MSE train loss: {:.4f},  \r\n'.format(count, len(loop), loss))
 
             # print('run: {}/{} MSE train loss: {:.4f}, angle loss: {:.4f} {:.4f} {:.4f} translation loss: {:.4f} {:.4f} {:.4f} '
             #         .format(count, len(loop), train_loss, alpha_loss, beta_loss, gamma_loss, x_loss,y_loss, z_loss))

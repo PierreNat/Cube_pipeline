@@ -21,7 +21,7 @@ print(device)
 
 file_name_extension = '10000_t'  # choose the corresponding database to use
 
-batch_size = 6
+batch_size = 4
 
 n_epochs = 4
 
