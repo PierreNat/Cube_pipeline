@@ -1,5 +1,6 @@
 import numpy as np
 import math as m
+import torch
 
 
 def BuildTransformationMatrix(tx=0, ty=0, tz=0, alpha=0, beta=0, gamma=0):
@@ -27,7 +28,8 @@ def BuildTransformationMatrix(tx=0, ty=0, tz=0, alpha=0, beta=0, gamma=0):
     # R = np.matmul(Rx, Ry)
     # R = np.matmul(R, Rz)
 
-    t = np.array([tx, ty, tz])
+    t = torch.from_numpy(np.array([tx, ty, tz]).astype(np.float32))
+
 
     return t, Rzyx
 
@@ -53,17 +55,18 @@ class camera_setttings():
                   [0,0,1]])  # shape of [nb_vertice, 3, 3]
 
     def __init__(self, R, t, vert): #R 1x3 array, t 1x2 array, number of vertices
-        self.R =R
+        self.R = R
         self.t = t
         self.alpha = R[0]
         self.beta= R[1]
         self.gamma = R[2]
         self.tx = t[0]
-        self.ty= t[1]
-        self.tz=t[2]
+        self.ty = t[1]
+        self.tz = t[2]
         # angle in radian
         self.t_mat, self.R_mat = BuildTransformationMatrix(self.tx, self.ty, self.tz, self.alpha, self.beta, self.gamma)
 
         self.K_vertices = np.repeat(camera_setttings.K[np.newaxis, :, :], vert, axis=0)
         self.R_vertices = np.repeat(self.R_mat[np.newaxis, :, :], vert, axis=0)
-        self.t_vertices = np.repeat(self.t_mat[np.newaxis, :], 1, axis=0)
+        self.t_vertices = np.repeat(self.t_mat[np.newaxis, :], 1, axis=0).cuda()
+        self.t_vertices.requires_grad = True

@@ -18,9 +18,11 @@ def lossBtwSils(GT_Sils,ComputedSils, lossfunction, plot=False):
     # plt.imshow(gtfloat, cmap='gray')
     # plt.show()
     # print(gtfloat.max(), gtfloat.min())
-    input.requires_grad = True
+
+    # input.requires_grad = True
+    print(input.requires_grad)
     lossfunction.reduction = 'none'
-    # print(input.requires_grad)
+
     temp_loss = lossfunction(input.double(), target.double())
     lossfunction.reduction = 'mean'
     mean_loss = lossfunction(input.double(), target.double())

@@ -106,9 +106,9 @@ for image, sil, param in train_dataloader:
 #  ------------------------------------------------------------------
 
 
-model = resnet50(cifar=True)
+model = resnet50(cifar=True) #use pretrained on imagenet if cifar is true
 model = model.to(device)  # transfer the neural net onto the GPU
-criterion = nn.MSELoss()
+criterion = nn.MSELoss() # define the loss (MSE, Crossentropy, Binarycrossentropy)
 
 #  ------------------------------------------------------------------
 

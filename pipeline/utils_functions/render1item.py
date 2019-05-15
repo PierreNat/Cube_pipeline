@@ -1,15 +1,17 @@
 import numpy as np
+import torch
 from pipeline.utils_functions.camera_settings import camera_setttings
 import neural_renderer as nr
 
 
 def limit(param):
     # return param
+    # return param
     up_limit = 14
     low_limit = 4
     if param < low_limit or param > up_limit:
         # print('param out of range was restricted')
-        if np.abs(param-low_limit) < np.abs(param-low_limit):
+        if torch.abs(param-low_limit) < torch.abs(param-low_limit):
             return low_limit
         else:
             return up_limit
@@ -62,6 +64,8 @@ def render_1_image(Obj_Name, params):
 
 def render_1_sil(Obj_Name, params):
     vertices_1, faces_1, textures_1, renderer = init(Obj_Name,params)
+
+    #TODO Sils_1 Required grad should be TRUE
     sils_1 = renderer(vertices_1, faces_1, textures_1, mode='silhouettes')  # [batch_size, RGB, image_size, image_size]
     sil = sils_1.detach().cpu().numpy().transpose((1, 2, 0))
     sil = np.squeeze((sil * 255)).astype(np.uint8)  # change from float 0-1 [512,512,1] to uint8 0-255 [512,512]

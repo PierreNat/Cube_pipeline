@@ -7,7 +7,7 @@ from torchvision.transforms import ToTensor
 
 def renderBatchSil(Obj_Name, predicted_params, ground_Truth, device, plot=False):
     batch_silhouettes = []  # create a void list for the rendered silhouette
-    nbrOfParam = np.shape(predicted_params)[0]
+    nbrOfParam = predicted_params.size()[0]
     nb_im = nbrOfParam
 
     for i in range(0, nbrOfParam):
@@ -28,6 +28,7 @@ def renderBatchSil(Obj_Name, predicted_params, ground_Truth, device, plot=False)
 
         batch_silhouettes.extend(sil)
 
+    #TODO sil database should carry grad TRUE
     plt.show()
     sils_database = np.reshape(batch_silhouettes, (nbrOfParam, 512, 512))  # shape(6, 512, 512) ndarray
     sils_database = torch.from_numpy(sils_database)

@@ -25,7 +25,7 @@ def main():
     print(vertices_1.shape)
     print(faces_1.shape)
 
-    file_name_extension = '10000_t_zOnly'
+    file_name_extension = 'test'
     nb_im = 10000
 
     #init and create renderer object

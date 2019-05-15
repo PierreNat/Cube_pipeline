@@ -47,16 +47,18 @@ def train_render(model, train_dataloader, val_dataloader,
             parameter = parameter.to(device)
 
             #image has size [batch_length, 3, 512, 512]
+            #predicted_param is a tensor with torch.siye[batch, 6]
             predicted_params = model(image)  # run prediction; output <- vector containing  the 6 transformation params
 
-            np_params = predicted_params.detach().cpu().numpy() #ensor to numpy array, ERROR HERE, DOES NOT HAVE GRAD
+            # np_params = predicted_params.detach().cpu().numpy() #ensor to numpy array, ERROR HERE, DOES NOT HAVE GRAD
 
             if count%200 == 0:
                 plot = True
             else:
                 plot = False
 
-            rendered_batch_silhouettes = renderBatchSil(obj_name, np_params, parameter.detach().cpu().numpy(), device, plot)
+            # loss = computeLoss(
+            rendered_batch_silhouettes = renderBatchSil(obj_name, predicted_params, parameter, device, plot)
 
             # zero the parameter gradients
             optimizer.zero_grad()
