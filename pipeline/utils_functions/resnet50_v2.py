@@ -182,7 +182,7 @@ class ResNet(nn.Module):
         return x
 
 
-def resnet50(pretrained=True, cifar = True, modelName='None', **kwargs):
+def resnet50_v2(pretrained=True, cifar = True, modelName='None', **kwargs):
     """Constructs a ResNet-50 model.
     Args:
         pretrained (bool): If True, returns a model pre-trained on ImageNet

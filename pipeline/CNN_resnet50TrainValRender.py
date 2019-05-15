@@ -11,6 +11,7 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from torchvision.transforms import ToTensor, Compose, Normalize, Lambda
 from pipeline.utils_functions.resnet50 import resnet50
+from pipeline.utils_functions.resnet50_v2 import resnet50_v2
 from pipeline.utils_functions.train_val_render import train_render
 from pipeline.utils_functions.cubeDataset import CubeDataset
 
