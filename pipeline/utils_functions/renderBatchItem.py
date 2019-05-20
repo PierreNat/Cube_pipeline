@@ -1,21 +1,29 @@
 import numpy as np
 from pipeline.utils_functions.render1item import render_1_sil, render_1_image
+import torch.nn as nn
 import torch
 import matplotlib.pyplot as plt
 from torchvision.transforms import ToTensor
 
 
-def renderBatchSil(Obj_Name, predicted_params, ground_Truth, device, plot=False):
+def renderBatchSil(Obj_Name, predicted_params, ground_Truth, loss_function, device, plot=False):
     batch_silhouettes = []  # create a void list for the rendered silhouette
     nbrOfParam = predicted_params.size()[0]
     nb_im = nbrOfParam
+    loss = 0
 
     for i in range(0, nbrOfParam):
         # define extrinsic parameter
         # predicted_params[i] = np.array([0, 0, 0, 2, 0.5*i, 8]) #test to enforce defined parameter
         sil_cp = render_1_sil(Obj_Name, predicted_params[i])
+        sil_GT = render_1_sil(Obj_Name, ground_Truth[i])
+        print(torch.max(sil_cp))
+        # loss += torch.sum((sil_cp - sil_GT) ** 2)
+        sil_cp2 = sil_cp.squeeze() #from [1,512,512] to [512,512]
+        sil_GT2 = sil_GT.squeeze().detach()
+        loss += loss_function(sil_cp2, sil_GT2)
 
-        #TODO compute the loss here with cp and gt ?
+        # if we want to see the result
         if plot:
             sil_GT =  render_1_sil(Obj_Name, ground_Truth[i])
             # plt.subplot(1, nb_im, i + 1)
@@ -34,13 +42,16 @@ def renderBatchSil(Obj_Name, predicted_params, ground_Truth, device, plot=False)
             plt.imshow(sil_cp, cmap='gray')
 
 
-        batch_silhouettes.extend(sil_cp)
 
-    #TODO sil database should carry grad TRUE
+    # plt.show()
+    #
+    #
+    # sils_database = np.reshape(batch_silhouettes, (nbrOfParam, 512, 512))  # shape(6, 512, 512) ndarray
+    # sils_database = torch.from_numpy(sils_database)
+    # return sils_database.to(device)
+
     plt.show()
-    sils_database = np.reshape(batch_silhouettes, (nbrOfParam, 512, 512))  # shape(6, 512, 512) ndarray
-    sils_database = torch.from_numpy(sils_database)
-    return sils_database.to(device)
+    return loss/nbrOfParam
 
 
 def renderBatchImage(Obj_Name, predicted_params, device):

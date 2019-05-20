@@ -57,13 +57,13 @@ def train_render(model, train_dataloader, val_dataloader,
             else:
                 plot = False
 
-            # loss = computeLoss(
-            rendered_batch_silhouettes = renderBatchSil(obj_name, predicted_params, parameter, device, plot)
+            # object, predicted, ground truth, loss , cuda , and bool for printing logic
+            loss = renderBatchSil(obj_name, predicted_params, parameter, loss_function, device, plot)
 
             # zero the parameter gradients
             optimizer.zero_grad()
 
-            loss = lossBtwSils(silhouette, rendered_batch_silhouettes, loss_function, plot) # loss cross Entropy
+            # loss = lossBtwSils(silhouette, rendered_batch_silhouettes, loss_function, plot) # loss cross Entropy
 
             loss.backward() # mutiple times accumulates the gradient (by addition) for each parameter
             optimizer.step() # performs a parameter update based on the current gradient, SGD is used here
