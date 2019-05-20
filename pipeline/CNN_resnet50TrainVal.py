@@ -18,11 +18,11 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 torch.cuda.empty_cache()
 print(device)
 
-file_name_extension = '3000rgbnew'  # choose the corresponding database to use
+file_name_extension = '10000_t'  # choose the corresponding database to use
 
-batch_size = 6
+batch_size = 4
 
-n_epochs = 3
+n_epochs = 4
 
 target_size = (512, 512)
 
@@ -34,7 +34,7 @@ fileExtension = 'TEST' #string to ad at the end of the file
 
 cubeSetName = 'cubes_{}'.format(file_name_extension) #used to describe the document name
 
-date4File = '042819' #mmddyy
+date4File = '052019' #mmddyy
 
 cubes = np.load(cubes_file)
 sils = np.load(silhouettes_file)

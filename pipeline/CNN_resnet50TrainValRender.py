@@ -20,7 +20,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 torch.cuda.empty_cache()
 print(device)
 
-file_name_extension = '10000_t_zOnly'  # choose the corresponding database to use
+file_name_extension = '10000_t'  # choose the corresponding database to use
 
 batch_size = 4
 
@@ -36,7 +36,7 @@ fileExtension = 'first_try' #string to ad at the end of the file
 
 cubeSetName = 'cubes_{}'.format(file_name_extension) #used to describe the document name
 
-date4File = '050119' #mmddyy
+date4File = '052019' #mmddyy
 
 obj_name = 'rubik_color'
 
@@ -45,6 +45,7 @@ sils = np.load(silhouettes_file)
 params = np.load(parameters_file)
 
 #  ------------------------------------------------------------------
+
 ratio = 0.9  # 90%training 10%validation
 split = int(len(cubes)*0.9)
 test_length = 1000

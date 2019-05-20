@@ -20,8 +20,8 @@ def train_render(model, train_dataloader, val_dataloader,
 
     plot = False #plot the running renderered batch of image
 
-    f = open("./results/{}_{}_{}_batchs_{}_epochs_{}_losses.txt".format(date4File, cubeSetName, str(batch_size), str(n_epochs), fileExtension), "w+")
-    g = open("./results/{}_{}_{}_batchs_{}_epochs_{}_Rtvalues.txt".format(date4File, cubeSetName, str(batch_size), str(n_epochs), fileExtension), "w+")
+    f = open("./results/{}_{}_{}_batchs_{}_epochs_{}_losses_RenderRegr.txt".format(date4File, cubeSetName, str(batch_size), str(n_epochs), fileExtension), "w+")
+    g = open("./results/{}_{}_{}_batchs_{}_epochs_{}_Rtvalues_RenderRegr.txt".format(date4File, cubeSetName, str(batch_size), str(n_epochs), fileExtension), "w+")
     g.write('batch computed angle computed ( aby) translation (xyz)  \r\n')
     for epoch in range(n_epochs):
 
@@ -51,12 +51,12 @@ def train_render(model, train_dataloader, val_dataloader,
             predicted_params = model(image)  # run prediction; output <- vector containing  the 6 transformation params
 
             # hard reset to 0 value that we don-t want to train
-            zero_array = torch.zeros(4, 5)
-            zero_array = zero_array.to(device)
-            predicted_params = torch.cat((zero_array, predicted_params), 1)
+            # zero_array = torch.zeros(4, 5)
+            # zero_array = zero_array.to(device)
+            # predicted_params = torch.cat((zero_array, predicted_params), 1)
             # np_params = predicted_params.detach().cpu().numpy() #ensor to numpy array, ERROR HERE, DOES NOT HAVE GRAD
 
-            if count % 1000 == 0:
+            if count % 500 == 0:
                 plot = True
             else:
                 plot = False

@@ -30,15 +30,18 @@ def renderBatchSil(Obj_Name, predicted_params, ground_Truth, loss_function, devi
         distanc_im = sil_GT.detach().cpu().numpy().transpose((1, 2, 0))
         # plt.imshow(np.squeeze(distanc_im))
         # plt.show()
-        new_dist_im = np.where(distanc_im == 0, -1, distanc_im)*-1
-        image = skfmm.distance(new_dist_im)
+        # new_dist_im = np.where(distanc_im == 0, -1, distanc_im)*-1
+        # dist_image = skfmm.distance(new_dist_im)
+        # dist_image = np.squeeze(dist_image)
+        # # print(image.shape)
+        # # plt.imshow(dist_image)
+        # # plt.show()
+        #
+        # dist_image_tensor = torch.from_numpy(dist_image).to(device)
+        # pred_dist = (sil_cp2.double()*dist_image_tensor)
+        # loss += loss_function(sil_cp2, sil_GT2) + (nn.MSELoss()(pred_dist, sil_GT2.double()).float())
 
-        image = np.squeeze(image)
-        print(image.shape)
-        plt.imshow(image)
-        plt.show()
-
-        loss += loss_function(sil_cp2, sil_GT2) + nn.MSELoss()(predicted_params[i], ground_Truth[i]+torch.randn(1).to(device))
+        loss += loss_function(sil_cp2, sil_GT2) + nn.MSELoss()(predicted_params[i], ground_Truth[i]+(torch.randn(6)/10).to(device))
         # loss += torch.sum((sil_cp - sil_GT) ** 2)
 
         # if we want to see the result

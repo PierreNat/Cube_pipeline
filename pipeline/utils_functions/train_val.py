@@ -14,8 +14,8 @@ def train(model, train_dataloader, val_dataloader, n_epochs, loss_function, date
     best_score  = 1000
     noDecreaseCount = 0
 
-    f = open("./results/{}_{}_{}_batchs_{}_epochs_{}_losses.txt".format(date4File, cubeSetName, str(batch_size), str(n_epochs), fileExtension), "w+")
-    g = open("./results/{}_{}_{}_batchs_{}_epochs_{}_Rtvalues.txt".format(date4File, cubeSetName, str(batch_size), str(n_epochs), fileExtension), "w+")
+    f = open("./results/{}_{}_{}_batchs_{}_epochs_{}_losses_regressionOnly.txt".format(date4File, cubeSetName, str(batch_size), str(n_epochs), fileExtension), "w+")
+    g = open("./results/{}_{}_{}_batchs_{}_epochs_{}_Rtvalues_regressionOnly.txt".format(date4File, cubeSetName, str(batch_size), str(n_epochs), fileExtension), "w+")
     g.write('batch angle (error in degree) translation (error in m)  \r\n')
     for epoch in range(n_epochs):
 
