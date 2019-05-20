@@ -3,11 +3,14 @@ from pipeline.utils_functions.render1item import render_1_sil, render_1_image
 import torch.nn as nn
 import torch
 import matplotlib.pyplot as plt
+import skfmm
+import numpy as np
 from torchvision.transforms import ToTensor
 
 
 def renderBatchSil(Obj_Name, predicted_params, ground_Truth, loss_function, device, plot=False):
     batch_silhouettes = []  # create a void list for the rendered silhouette
+    # ground_Truth[:][5] = ground_Truth[:][5]+ torch.randn(1).uniform_(0, 1)
     nbrOfParam = predicted_params.size()[0]
     nb_im = nbrOfParam
     loss = 0
@@ -22,8 +25,20 @@ def renderBatchSil(Obj_Name, predicted_params, ground_Truth, loss_function, devi
         sil_cp2 = sil_cp.squeeze() #from [1,512,512] to [512,512]
         sil_GT2 = sil_GT.squeeze().detach()
         # print(ground_Truth[i][5])
-        # ground_Truth[i][5] = ground_Truth[i][5] + torch.randn(1).uniform_(0, 1)
-        loss += loss_function(sil_cp2, sil_GT2) + nn.MSELoss()(predicted_params[i], ground_Truth[i])
+        # ground_Truth[i][5] = ground_Truth[i][5] + torch.randn(1).uniform_(0,1)
+
+        distanc_im = sil_GT.detach().cpu().numpy().transpose((1, 2, 0))
+        # plt.imshow(np.squeeze(distanc_im))
+        # plt.show()
+        new_dist_im = np.where(distanc_im == 0, -1, distanc_im)*-1
+        image = skfmm.distance(new_dist_im)
+
+        image = np.squeeze(image)
+        print(image.shape)
+        plt.imshow(image)
+        plt.show()
+
+        loss += loss_function(sil_cp2, sil_GT2) + nn.MSELoss()(predicted_params[i], ground_Truth[i]+torch.randn(1).to(device))
         # loss += torch.sum((sil_cp - sil_GT) ** 2)
 
         # if we want to see the result

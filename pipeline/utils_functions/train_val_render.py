@@ -49,32 +49,35 @@ def train_render(model, train_dataloader, val_dataloader,
             #image has size [batch_length, 3, 512, 512]
             #predicted_param is a tensor with torch.siye[batch, 6]
             predicted_params = model(image)  # run prediction; output <- vector containing  the 6 transformation params
+
+            # hard reset to 0 value that we don-t want to train
             zero_array = torch.zeros(4, 5)
             zero_array = zero_array.to(device)
             predicted_params = torch.cat((zero_array, predicted_params), 1)
             # np_params = predicted_params.detach().cpu().numpy() #ensor to numpy array, ERROR HERE, DOES NOT HAVE GRAD
 
-            if count % 20 == 0:
+            if count % 1000 == 0:
                 plot = True
             else:
                 plot = False
 
+
+            # # zero the parameter gradients
+            optimizer.zero_grad()
+
             # object, predicted, ground truth, loss , cuda , and bool for printing logic
             loss = renderBatchSil(obj_name, predicted_params, parameter, loss_function, device, plot)
 
-            # zero the parameter gradients
-            optimizer.zero_grad()
 
-            # loss = lossBtwSils(silhouette, rendered_batch_silhouettes, loss_function, plot) # loss cross Entropy
 
-            loss.backward()  # mutiple times accumulates the gradient (by addition) for each parameter
+            loss.backward()  # multiple times accumulates the gradient (by addition) for each parameter
             optimizer.step()  # performs a parameter update based on the current gradient, SGD is used here
 
             parameters.extend(parameter.cpu().numpy())  # append ground truth label
             predict_params.extend(predicted_params.detach().cpu().numpy())  # append computed parameters
             losses.append(loss.item())  # batch length is append every time
 
-            # store value GT(ground truth) and predicted param differenc
+            # store value GT(ground truth) and predicted param difference
             for i in range(0, predicted_params .shape[0]):
                 g.write('{} '.format(count))
                 for j in range(0, 6):
