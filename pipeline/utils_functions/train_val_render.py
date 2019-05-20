@@ -49,10 +49,12 @@ def train_render(model, train_dataloader, val_dataloader,
             #image has size [batch_length, 3, 512, 512]
             #predicted_param is a tensor with torch.siye[batch, 6]
             predicted_params = model(image)  # run prediction; output <- vector containing  the 6 transformation params
-
+            zero_array = torch.zeros(4, 5)
+            zero_array = zero_array.to(device)
+            predicted_params = torch.cat((zero_array, predicted_params), 1)
             # np_params = predicted_params.detach().cpu().numpy() #ensor to numpy array, ERROR HERE, DOES NOT HAVE GRAD
 
-            if count%200 == 0:
+            if count % 20 == 0:
                 plot = True
             else:
                 plot = False
@@ -65,8 +67,8 @@ def train_render(model, train_dataloader, val_dataloader,
 
             # loss = lossBtwSils(silhouette, rendered_batch_silhouettes, loss_function, plot) # loss cross Entropy
 
-            loss.backward() # mutiple times accumulates the gradient (by addition) for each parameter
-            optimizer.step() # performs a parameter update based on the current gradient, SGD is used here
+            loss.backward()  # mutiple times accumulates the gradient (by addition) for each parameter
+            optimizer.step()  # performs a parameter update based on the current gradient, SGD is used here
 
             parameters.extend(parameter.cpu().numpy())  # append ground truth label
             predict_params.extend(predicted_params.detach().cpu().numpy())  # append computed parameters

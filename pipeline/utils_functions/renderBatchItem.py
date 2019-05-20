@@ -17,11 +17,14 @@ def renderBatchSil(Obj_Name, predicted_params, ground_Truth, loss_function, devi
         # predicted_params[i] = np.array([0, 0, 0, 2, 0.5*i, 8]) #test to enforce defined parameter
         sil_cp = render_1_sil(Obj_Name, predicted_params[i])
         sil_GT = render_1_sil(Obj_Name, ground_Truth[i])
-        print(torch.max(sil_cp))
+        # print(torch.max(sil_cp))
         # loss += torch.sum((sil_cp - sil_GT) ** 2)
         sil_cp2 = sil_cp.squeeze() #from [1,512,512] to [512,512]
         sil_GT2 = sil_GT.squeeze().detach()
-        loss += loss_function(sil_cp2, sil_GT2)
+        # print(ground_Truth[i][5])
+        # ground_Truth[i][5] = ground_Truth[i][5] + torch.randn(1).uniform_(0, 1)
+        loss += loss_function(sil_cp2, sil_GT2) + nn.MSELoss()(predicted_params[i], ground_Truth[i])
+        # loss += torch.sum((sil_cp - sil_GT) ** 2)
 
         # if we want to see the result
         if plot:
