@@ -13,20 +13,28 @@ def renderBatchSil(Obj_Name, predicted_params, ground_Truth, device, plot=False)
     for i in range(0, nbrOfParam):
         # define extrinsic parameter
         # predicted_params[i] = np.array([0, 0, 0, 2, 0.5*i, 8]) #test to enforce defined parameter
-        sil = render_1_sil(Obj_Name, predicted_params[i])
+        sil_cp = render_1_sil(Obj_Name, predicted_params[i])
+
+        #TODO compute the loss here with cp and gt ?
         if plot:
             sil_GT =  render_1_sil(Obj_Name, ground_Truth[i])
             # plt.subplot(1, nb_im, i + 1)
             # plt.imshow(sil, cmap='gray')
 
+            #conversion to use numpy imshow
+            sil_cp = sil_cp.detach().cpu().numpy().transpose((1, 2, 0))
+            sil_cp = np.squeeze((sil_cp * 255)).astype(np.uint8)
+            sil_GT = sil_GT .detach().cpu().numpy().transpose((1, 2, 0))
+            sil_GT  = np.squeeze((sil_GT  * 255)).astype(np.uint8)
+
             plt.subplot(2, nb_im, i + 1)
             plt.imshow(sil_GT, cmap='gray')
 
             plt.subplot(2, nb_im, i + 1 + nb_im)
-            plt.imshow(sil, cmap='gray')
+            plt.imshow(sil_cp, cmap='gray')
 
 
-        batch_silhouettes.extend(sil)
+        batch_silhouettes.extend(sil_cp)
 
     #TODO sil database should carry grad TRUE
     plt.show()

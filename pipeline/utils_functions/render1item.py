@@ -67,6 +67,6 @@ def render_1_sil(Obj_Name, params):
 
     #TODO Sils_1 Required grad should be TRUE
     sils_1 = renderer(vertices_1, faces_1, textures_1, mode='silhouettes')  # [batch_size, RGB, image_size, image_size]
-    sil = sils_1.detach().cpu().numpy().transpose((1, 2, 0))
-    sil = np.squeeze((sil * 255)).astype(np.uint8)  # change from float 0-1 [512,512,1] to uint8 0-255 [512,512]
-    return sil
+    # sil = sils_1.detach().cpu().numpy().transpose((1, 2, 0))
+    # sil = np.squeeze((sil * 255)).astype(np.uint8)  # change from float 0-1 [512,512,1] to uint8 0-255 [512,512]
+    return sils_1
