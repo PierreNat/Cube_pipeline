@@ -22,7 +22,7 @@ file_name_extension = '10000_t'  # choose the corresponding database to use
 
 batch_size = 4
 
-n_epochs = 4
+n_epochs = 1
 
 target_size = (512, 512)
 
@@ -34,7 +34,7 @@ fileExtension = 'TEST' #string to ad at the end of the file
 
 cubeSetName = 'cubes_{}'.format(file_name_extension) #used to describe the document name
 
-date4File = '052019' #mmddyy
+date4File = '052119' #mmddyy
 
 cubes = np.load(cubes_file)
 sils = np.load(silhouettes_file)
@@ -90,18 +90,18 @@ val_dataloader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True, nu
 test_dataloader = DataLoader(test_dataset, batch_size=8, shuffle=False, num_workers=2)
 
 
-for image, sil, param in train_dataloader:
-
-    # print(image[2])
-    print(image.size(), param.size()) #torch.Size([batch, 3, 512, 512]) torch.Size([batch, 6])
-    im =2
-    print(param[im])  # parameter in form tensor([2.5508, 0.0000, 0.0000, 0.0000, 0.0000, 5.0000])
-
-    image2show = image[im]  # indexing random  one image
-    print(image2show.size()) #torch.Size([3, 512, 512])
-    plt.imshow((image2show * 0.5 + 0.5).numpy().transpose(1, 2, 0))
-    plt.show()
-    break  # break here just to show 1 batch of data
+# for image, sil, param in train_dataloader:
+#
+#     # print(image[2])
+#     print(image.size(), param.size()) #torch.Size([batch, 3, 512, 512]) torch.Size([batch, 6])
+#     im =2
+#     print(param[im])  # parameter in form tensor([2.5508, 0.0000, 0.0000, 0.0000, 0.0000, 5.0000])
+#
+#     image2show = image[im]  # indexing random  one image
+#     print(image2show.size()) #torch.Size([3, 512, 512])
+#     plt.imshow((image2show * 0.5 + 0.5).numpy().transpose(1, 2, 0))
+#     plt.show()
+#     break  # break here just to show 1 batch of data
 
 #  ------------------------------------------------------------------
 
@@ -116,7 +116,7 @@ train_losses, val_losses = train(model, train_dataloader, val_dataloader, n_epoc
 
 #  ------------------------------------------------------------------
 
-torch.save(model.state_dict(), 'models/{}_FinalModel_train_{}_{}_batchs_{}_epochs_{}.pth'.format(date4File, cubeSetName, str(batch_size), str(n_epochs), fileExtension))
+torch.save(model.state_dict(), 'models/{}_FinalModel_train_{}_{}_batchs_{}_epochs_{}_Regr.pth'.format(date4File, cubeSetName, str(batch_size), str(n_epochs), fileExtension))
 print('parameters saved')
 
 #  ------------------------------------------------------------------

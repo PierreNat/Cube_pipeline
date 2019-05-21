@@ -41,7 +41,7 @@ def renderBatchSil(Obj_Name, predicted_params, ground_Truth, loss_function, devi
         # pred_dist = (sil_cp2.double()*dist_image_tensor)
         # loss += loss_function(sil_cp2, sil_GT2) + (nn.MSELoss()(pred_dist, sil_GT2.double()).float())
 
-        loss += loss_function(sil_cp2, sil_GT2) + nn.MSELoss()(predicted_params[i], ground_Truth[i]+(torch.randn(6)/10).to(device))
+        loss += loss_function(sil_cp2, sil_GT2) + nn.MSELoss()(predicted_params[i], ground_Truth[i]+(torch.randn(6)/10).to(device)) #compute loss and add constrain and noise
         # loss += torch.sum((sil_cp - sil_GT) ** 2)
 
         # if we want to see the result

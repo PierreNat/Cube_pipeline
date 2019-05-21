@@ -20,7 +20,7 @@ def train(model, train_dataloader, val_dataloader, n_epochs, loss_function, date
     for epoch in range(n_epochs):
 
         optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
-        f.write('Train, run epoch: {}/{} with Lr {} \r\n'.format(epoch, n_epochs, str(learning_rate)))
+        f.write('Regression only Train loss, run epoch: {}/{} with Lr {} \r\n'.format(epoch, n_epochs, str(learning_rate)))
         g.write('Train, run epoch: {}/{} with Lr {} \r\n'.format(epoch, n_epochs, str(learning_rate)))
         print('run epoch: {} with Lr {}'.format(epoch, learning_rate))
 
@@ -112,7 +112,7 @@ def train(model, train_dataloader, val_dataloader, n_epochs, loss_function, date
         print('Mean val loss for epoch {} is {}'.format(epoch, val_epoch_score))
 
         if val_epoch_score < best_score:   #is the validation batch loss better than previous one?
-            torch.save(model.state_dict(), './models/{}_TempModel_Best_train_{}_{}_batchs_epochs_n{}_{}.pth'.format(date4File, cubeSetName, str(batch_size), str(epoch), fileExtension))
+            torch.save(model.state_dict(), './models/{}_TempModel_Best_train_{}_{}_batchs_epochs_n{}_{}__Regr.pth'.format(date4File, cubeSetName, str(batch_size), str(epoch), fileExtension))
             print('parameters saved for epoch {}'.format(epoch))
 
             noDecreaseCount = 0

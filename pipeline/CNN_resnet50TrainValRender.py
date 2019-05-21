@@ -32,11 +32,11 @@ cubes_file = 'Npydatabase/cubes_{}.npy'.format(file_name_extension)
 silhouettes_file = 'Npydatabase/sils_{}.npy'.format(file_name_extension)
 parameters_file = 'Npydatabase/params_{}.npy'.format(file_name_extension)
 
-fileExtension = 'first_try' #string to ad at the end of the file
+fileExtension = 'Test' #string to ad at the end of the file
 
 cubeSetName = 'cubes_{}'.format(file_name_extension) #used to describe the document name
 
-date4File = '052019' #mmddyy
+date4File = '052119' #mmddyy
 
 obj_name = 'rubik_color'
 
@@ -112,7 +112,7 @@ train_losses, val_losses = train_render(model, train_dataloader, val_dataloader,
 
 #  ------------------------------------------------------------------
 
-torch.save(model.state_dict(), 'models/{}_FinalModel_train_{}_{}_batchs_{}_epochs_{}.pth'.format(date4File, cubeSetName, str(batch_size), str(n_epochs), fileExtension))
+torch.save(model.state_dict(), 'models/{}_FinalModel_train_{}_{}_batchs_{}_epochs_{}_RenderRegr.pth'.format(date4File, cubeSetName, str(batch_size), str(n_epochs), fileExtension))
 print('parameters saved')
 
 #  ------------------------------------------------------------------
