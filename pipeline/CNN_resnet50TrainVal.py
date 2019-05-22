@@ -22,7 +22,7 @@ file_name_extension = '10000_t'  # choose the corresponding database to use
 
 batch_size = 4
 
-n_epochs = 1
+n_epochs = 4
 
 target_size = (512, 512)
 

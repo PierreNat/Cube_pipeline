@@ -11,8 +11,8 @@ def testResnet(model, test_dataloader, loss_function, file_name_extension, devic
     predicted_params = []
     losses = []  # running loss
     count2 = 0
-    f = open("./results/Test_result_{}_Loss.txt".format(file_name_extension), "w+")
-    g = open("./results/Test_result_save_param_{}_Rtvalues.txt".format(file_name_extension), "w+")
+    f = open("./results/Test_result_{}_LossRegr.txt".format(file_name_extension), "w+")
+    g = open("./results/Test_result_save_param_{}_RtvaluesRegr.txt".format(file_name_extension), "w+")
     g.write('batch angle (error in degree) translation (error in m)  \r\n')
 
     loop = tqdm.tqdm(test_dataloader)

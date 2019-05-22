@@ -14,12 +14,13 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 torch.cuda.empty_cache()
 print(device)
 
-modelName = '042819_TempModel_Best_train_cubes_5000rgbRt_6_batchs_epochs_n39_last' #4 Rt 5000 images
+modelName = '052119_FinalModel_train_cubes_10000_t_4_batchs_4_epochs_TEST_Regr'
+# modelName = '042819_TempModel_Best_train_cubes_5000rgbRt_6_batchs_epochs_n39_last' #4 Rt 5000 images
 # modelName = '042619_TempModel_Best_train_cubes_10000rgbRt_6_batchs_epochs_n37_2000setRt' #4 Rt 2000 images
 # modelName = '042619_TempModel_Best_train_cubes_10000rgbAlphaBeta_6_batchs_epochs_n37_2000set2' #alpha beta rotation
 
-
-file_name_extension = '5000rgbRt'
+file_name_extension = '10000_t'
+# file_name_extension = '5000rgbRt'
 # file_name_extension = '2000rgbRt'
 # file_name_extension = '10000rgbAlphaBeta'
 
@@ -43,8 +44,8 @@ test_im = cubes[:test_length]
 test_sil = sils[:test_length]
 test_param = params[:test_length]
 
-plt.imshow(test_im[5])
-plt.show()
+# plt.imshow(test_im[5])
+# plt.show()
 #  ------------------------------------------------------------------
 
 from torch.utils.data import Dataset
@@ -89,18 +90,18 @@ test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False,
 #  ------------------------------------------------------------------
 
 
-for image, sil, param in test_dataloader:
-
-    # print(image[2])
-    print(image.size(), param.size()) #torch.Size([batch, 3, 512, 512]) torch.Size([batch, 6])
-    im =2
-    print(param[im])  # parameter in form tensor([2.5508, 0.0000, 0.0000, 0.0000, 0.0000, 5.0000])
-
-    image2show = image[im]  # indexing random  one image
-    print(image2show.size()) #torch.Size([3, 512, 512])
-    plt.imshow((image2show * 0.5 + 0.5).numpy().transpose(1, 2, 0))
-    plt.show()
-    break  # break here just to show 1 batch of data
+# for image, sil, param in test_dataloader:
+#
+#     # print(image[2])
+#     print(image.size(), param.size()) #torch.Size([batch, 3, 512, 512]) torch.Size([batch, 6])
+#     im =2
+#     print(param[im])  # parameter in form tensor([2.5508, 0.0000, 0.0000, 0.0000, 0.0000, 5.0000])
+#
+#     image2show = image[im]  # indexing random  one image
+#     print(image2show.size()) #torch.Size([3, 512, 512])
+#     plt.imshow((image2show * 0.5 + 0.5).numpy().transpose(1, 2, 0))
+#     plt.show()
+#     break  # break here just to show 1 batch of data
 
 
 #  ------------------------------------------------------------------
@@ -123,23 +124,32 @@ test_losses, count, parameters, predicted_params = testResnet(model, test_datalo
 obj_name = 'rubik_color'
 
 nb_im = 7
-loop = tqdm.tqdm(range(0,nb_im))
-for i in loop:
+# loop = tqdm.tqdm(range(0,nb_im))
+for i in range(0,nb_im):
 
-    randIm = i+6
-    print('computed parameter_{}: '.format(i+1))
-    print(predicted_params[randIm])
-    print('ground truth parameter_{}: '.format(i+1))
-    print(params[randIm])
-    print('error {} degree and {} meter '.format(np.rad2deg(predicted_params[randIm][0:3]-params[randIm][0:3]), predicted_params[randIm][3:6]-params[randIm][3:6]))
+    randIm = i+6 #select a random image
+    # print('computed parameter_{}: '.format(i+1))
+    # print(predicted_params[randIm])
+    # print('ground truth parameter_{}: '.format(i+1))
+    # print(params[randIm])
+    print('angle and translation MSE loss for {}: '.format(i))
+    loss_angle = (predicted_params[randIm][0:3] - params[randIm][0:3])**2
+    loss_translation = (predicted_params[randIm][3:6]-params[randIm][3:6])**2
+    print(loss_angle, loss_translation)
+    # print('error {} degree and {} meter '.format(np.rad2deg(predicted_params[randIm][0:3]-params[randIm][0:3]), predicted_params[randIm][3:6]-params[randIm][3:6]))
+
 
     im = render_1_image(obj_name, predicted_params[randIm])  # create the dataset
 
+
     plt.subplot(2, nb_im, i+1)
     plt.imshow(test_im[randIm])
+    plt.title('Ground truth cube {}'.format(i))
 
     plt.subplot(2, nb_im, i+1+nb_im)
     plt.imshow(im)
+    plt.title('Computed cube {}'.format(i))
+
 
 plt.show()
 print('finish')

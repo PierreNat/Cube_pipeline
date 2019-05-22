@@ -2,7 +2,6 @@ import numpy as np
 import tqdm
 import torch
 from pipeline.utils_functions.renderBatchItem import renderBatchSil
-from pipeline.utils_functions.lossBtwSils import lossBtwSils
 
 def train_render(model, train_dataloader, val_dataloader,
                  n_epochs, loss_function,
@@ -56,10 +55,10 @@ def train_render(model, train_dataloader, val_dataloader,
             # predicted_params = torch.cat((zero_array, predicted_params), 1)
             # np_params = predicted_params.detach().cpu().numpy() #ensor to numpy array, ERROR HERE, DOES NOT HAVE GRAD
 
-            if count % 200 == 0:
-                plot = True
-            else:
-                plot = False
+            # if count % 200 == 0:
+            #     plot = True
+            # else:
+            #     plot = False
 
 
             # # zero the parameter gradients
