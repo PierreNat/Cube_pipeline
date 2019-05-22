@@ -10,7 +10,7 @@ def testResnet(model, test_dataloader, loss_function, file_name_extension, devic
     parameters = []  # ground truth labels
     predicted_params = []
     losses = []  # running loss
-    count2 = 0
+    count = 0
     f = open("./results/Test_result_{}_LossRegr.txt".format(file_name_extension), "w+")
     g = open("./results/Test_result_save_param_{}_RtvaluesRegr.txt".format(file_name_extension), "w+")
     g.write('batch angle (error in degree) translation (error in m)  \r\n')
@@ -29,9 +29,16 @@ def testResnet(model, test_dataloader, loss_function, file_name_extension, devic
         predicted_params.extend(predicted_param.detach().cpu().numpy()) # append computed parameters
         losses.append(loss.item())  # running loss
 
+        alpha_loss = loss_function(predicted_param[:, 0], parameter[:, 0])
+        beta_loss = loss_function(predicted_param[:, 1], parameter[:, 1])
+        gamma_loss = loss_function(predicted_param[:, 2], parameter[:, 2])
+        x_loss = loss_function(predicted_param[:, 3], parameter[:, 3])
+        y_loss = loss_function(predicted_param[:, 4], parameter[:, 4])
+        z_loss = loss_function(predicted_param[:, 5], parameter[:, 5])
+
         #store value GT(ground truth) and predicted param
         for i in range(0, predicted_param.shape[0]):
-            g.write('{} '.format(count2))
+            g.write('{} '.format(count))
             for j in range(0, 6):
                 estim = predicted_param[i][j].detach().cpu().numpy()
                 gt = parameter[i][j].detach().cpu().numpy()
@@ -44,13 +51,15 @@ def testResnet(model, test_dataloader, loss_function, file_name_extension, devic
         av_loss = np.mean(np.array(losses))
         test_losses.append(av_loss)  # global losses array on the way
 
-        print('run: {}/{} MSE test loss: {:.4f}\r\n'.format(count2, len(loop), av_loss))
-        f.write('run: {}/{}  MSE test loss: {:.4f}\r\n'.format(count2, len(loop), av_loss))
+        # print('run: {}/{} MSE test loss: {:.4f}\r\n'.format(count, len(loop), av_loss))
+        f.write(
+            'run: {}/{} MSE train loss: {:.4f}, angle loss: {:.4f} {:.4f} {:.4f} translation loss: {:.4f} {:.4f} {:.4f}  \r\n'
+            .format(count, len(loop), av_loss, alpha_loss, beta_loss, gamma_loss, x_loss, y_loss, z_loss))
 
-        count2 = count2 + 1
+        count = count + 1
 
     f.close()
     g.close()
 
-    return test_losses, count2, parameters, predicted_params
+    return test_losses, count, parameters, predicted_params
 

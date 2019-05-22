@@ -14,7 +14,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 torch.cuda.empty_cache()
 print(device)
 
-modelName = '052119_FinalModel_train_cubes_10000_t_4_batchs_5_epochs_Test_RenderRegr'
+modelName = '052119_TempModel_Best_train_cubes_10000_t_4_batchs_epochs_n3_Test_RenderRegr'
 # modelName = '042819_TempModel_Best_train_cubes_5000rgbRt_6_batchs_epochs_n39_last' #4 Rt 5000 images
 # modelName = '042619_TempModel_Best_train_cubes_10000rgbRt_6_batchs_epochs_n37_2000setRt' #4 Rt 2000 images
 # modelName = '042619_TempModel_Best_train_cubes_10000rgbAlphaBeta_6_batchs_epochs_n37_2000set2' #alpha beta rotation

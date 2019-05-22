@@ -45,7 +45,7 @@ def main():
         alpha = 0 #uniform(0, 180)
         beta =  0 #uniform(0, 180)
         gamma = 0 #uniform(0, 180)
-        x = 0
+        x = uniform(-2, 2)
         y = uniform(-2, 2)
         z = uniform(4, 14)
         R = np.array([np.radians(alpha), np.radians(beta), np.radians(gamma)])  # angle in degree

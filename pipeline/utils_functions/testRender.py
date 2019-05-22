@@ -35,6 +35,14 @@ def testRenderResnet(model, test_dataloader, loss_function, file_name_extension,
         predict_params.extend(predicted_params.detach().cpu().numpy())  # append computed parameters
         losses.append(loss.item())  # batch length is append every time
 
+
+        alpha_loss = loss_function(predicted_params[:, 0], parameter[:, 0])
+        beta_loss = loss_function(predicted_params[:, 1], parameter[:, 1])
+        gamma_loss = loss_function(predicted_params[:, 2], parameter[:, 2])
+        x_loss = loss_function(predicted_params[:, 3], parameter[:, 3])
+        y_loss = loss_function(predicted_params[:, 4], parameter[:, 4])
+        z_loss = loss_function(predicted_params[:, 5], parameter[:, 5])
+
         # store value GT(ground truth) and predicted param difference
         for i in range(0, predicted_params .shape[0]):
             g.write('{} '.format(count))
@@ -54,8 +62,10 @@ def testRenderResnet(model, test_dataloader, loss_function, file_name_extension,
         av_loss = np.mean(np.array(losses))  #average loss of the batch
         test_losses.append(av_loss)  # global losses array of all batch average loss
 
-        print('run: {}/{} MSE test loss: {:.4f}\r\n'.format(count, len(loop), av_loss))
-        f.write('run: {}/{}  MSE test loss: {:.4f}\r\n'.format(count, len(loop), av_loss))
+        # print('run: {}/{} MSE test loss: {:.4f}\r\n'.format(count, len(loop), av_loss))
+        f.write(
+            'run: {}/{} MSE train loss: {:.4f}, angle loss: {:.4f} {:.4f} {:.4f} translation loss: {:.4f} {:.4f} {:.4f}  \r\n'
+            .format(count, len(loop), av_loss, alpha_loss, beta_loss, gamma_loss, x_loss, y_loss, z_loss))
 
         count = count + 1
 
