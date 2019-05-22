@@ -1,5 +1,5 @@
 import numpy as np
-from pipeline.utils_functions.render1item import render_1_sil, render_1_image
+from utils_functions.render1item import render_1_sil, render_1_image
 import torch.nn as nn
 import torch
 import matplotlib.pyplot as plt

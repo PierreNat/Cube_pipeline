@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-from pipeline.utils_functions.camera_settings import camera_setttings
+from utils_functions.camera_settings import camera_setttings
 import neural_renderer as nr
 
 

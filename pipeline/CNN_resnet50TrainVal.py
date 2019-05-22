@@ -9,9 +9,9 @@ import torch
 import numpy as np
 import matplotlib.pyplot as plt
 import torch.nn as nn
-from pipeline.utils_functions.resnet50 import resnet50
-from pipeline.utils_functions.train_val import train
-from pipeline.utils_functions.cubeDataset import CubeDataset
+from utils_functions.resnet50 import resnet50
+from utils_functions.train_val import train
+from utils_functions.cubeDataset import CubeDataset
 
 # device = torch.device('cpu')
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -112,7 +112,7 @@ criterion = nn.MSELoss() # define the loss (MSE, Crossentropy, Binarycrossentrop
 
 #  ------------------------------------------------------------------
 
-train_losses, val_losses = train(model, train_dataloader, test_dataloader, n_epochs, criterion, date4File, cubeSetName, batch_size, fileExtension, device)
+train_losses, all_Test_losses = train(model, train_dataloader, test_dataloader, n_epochs, criterion, date4File, cubeSetName, batch_size, fileExtension, device)
 
 #  ------------------------------------------------------------------
 

@@ -1,7 +1,7 @@
 import tqdm
 import numpy as np
 import torch
-from pipeline.utils_functions.renderBatchItem import renderBatchSil
+from utils_functions.renderBatchItem import renderBatchSil
 
 def testRenderResnet(model, test_dataloader, loss_function, file_name_extension, device , obj_name, epoch_number = 0):
     # monitor loss functions as the training progresses

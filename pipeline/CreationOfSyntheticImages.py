@@ -5,7 +5,7 @@ from numpy.random import uniform
 import neural_renderer as nr
 import matplotlib.pyplot as plt
 import tqdm
-from pipeline.utils_functions.camera_settings import camera_setttings
+from utils_functions.camera_settings import camera_setttings
 
 def main():
 

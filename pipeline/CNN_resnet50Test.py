@@ -4,9 +4,9 @@ import numpy as np
 import tqdm
 import matplotlib.pyplot as plt
 
-from pipeline.utils_functions.render1item import render_1_image
-from pipeline.utils_functions.resnet50 import resnet50
-from pipeline.utils_functions.test import testResnet
+from utils_functions.render1item import render_1_image
+from utils_functions.resnet50 import resnet50
+from utils_functions.test import testResnet
 
 
 # device = torch.device('cpu')

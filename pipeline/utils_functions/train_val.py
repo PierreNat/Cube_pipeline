@@ -1,16 +1,14 @@
 import numpy as np
 import tqdm
 import torch
-from pipeline.utils_functions.test import testResnet
+from utils_functions.test import testResnet
 
 def train(model, train_dataloader, test_dataloader, n_epochs, loss_function, date4File, cubeSetName, batch_size, fileExtension, device):
     # monitor loss functions as the training progresses
     learning_rate = 0.01
     train_losses = []
     train_epoch_losses = []
-    val_losses = []
-
-    val_epoch_losses = []
+    all_Test_losses = []
 
     best_score  = 1000
     noDecreaseCount = 0
@@ -89,10 +87,11 @@ def train(model, train_dataloader, test_dataloader, n_epochs, loss_function, dat
         #test phase after the training
         print('test phase epoch {}'.format(epoch))
         model.eval()
-        test_losses, count, parameters, predicted_params = testResnet(model, test_dataloader, loss_function,
+        test_losses, count, test_parameters, test_predicted_params = testResnet(model, test_dataloader, loss_function,
                                                                       fileExtension, device, epoch_number=epoch)
+        all_Test_losses.append(test_losses)
 
     f.close()
     g.close()
 
-    return train_epoch_losses, val_epoch_losses
+    return train_epoch_losses, all_Test_losses

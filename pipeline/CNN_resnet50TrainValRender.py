@@ -10,9 +10,9 @@ import matplotlib.pyplot as plt
 import torch.nn as nn
 from torch.utils.data import DataLoader
 from torchvision.transforms import ToTensor, Compose, Normalize, Lambda
-from pipeline.utils_functions.resnet50 import resnet50
-from pipeline.utils_functions.train_val_render import train_render
-from pipeline.utils_functions.cubeDataset import CubeDataset
+from utils_functions.resnet50 import resnet50
+from utils_functions.train_val_render import train_render
+from utils_functions.cubeDataset import CubeDataset
 
 # device = torch.device('cpu')
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -105,7 +105,7 @@ criterion = nn.MSELoss()  #nn.BCELoss()   #nn.CrossEntropyLoss()  define the los
 #
 #  ------------------------------------------------------------------
 
-train_losses, val_losses = train_render(model, train_dataloader, test_dataloader,
+train_losses, all_Test_losses = train_render(model, train_dataloader, test_dataloader,
                                         n_epochs, criterion,
                                         date4File, cubeSetName, batch_size, fileExtension, device, obj_name)
 

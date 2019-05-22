@@ -1,8 +1,8 @@
 import numpy as np
 import tqdm
 import torch
-from pipeline.utils_functions.renderBatchItem import renderBatchSil
-from pipeline.utils_functions.testRender import testRenderResnet
+from utils_functions.renderBatchItem import renderBatchSil
+from utils_functions.testRender import testRenderResnet
 
 def train_render(model, train_dataloader, test_dataloader,
                  n_epochs, loss_function,
@@ -11,9 +11,7 @@ def train_render(model, train_dataloader, test_dataloader,
     learning_rate = 0.001
     train_losses = []
     train_epoch_losses = []
-    val_losses = []
-
-    val_epoch_losses = []
+    all_Test_losses = []
 
     best_score  = 1000
     noDecreaseCount = 0
@@ -127,8 +125,9 @@ def train_render(model, train_dataloader, test_dataloader,
         test_losses, count, parameters, predicted_params = testRenderResnet(model, test_dataloader, loss_function,
                                                                             fileExtension, device, obj_name,
                                                                             epoch_number=epoch)
+        all_Test_losses.append(test_losses)
 
     f.close()
     g.close()
 
-    return train_epoch_losses, val_epoch_losses
+    return train_epoch_losses, all_Test_losses
