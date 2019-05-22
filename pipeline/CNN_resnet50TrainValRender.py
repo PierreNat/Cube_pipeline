@@ -73,7 +73,7 @@ test_dataset = CubeDataset(test_im, test_sil, test_param, transforms)
 
 train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=2)
 val_dataloader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True, num_workers=2)
-test_dataloader = DataLoader(test_dataset, batch_size=8, shuffle=False, num_workers=2)
+test_dataloader = DataLoader(test_dataset, batch_size=4, shuffle=False, num_workers=2)
 
 #
 # for image, sil, param in train_dataloader:
@@ -105,7 +105,7 @@ criterion = nn.MSELoss()  #nn.BCELoss()   #nn.CrossEntropyLoss()  define the los
 #
 #  ------------------------------------------------------------------
 
-train_losses, val_losses = train_render(model, train_dataloader, val_dataloader,
+train_losses, val_losses = train_render(model, train_dataloader, test_dataloader,
                                         n_epochs, criterion,
                                         date4File, cubeSetName, batch_size, fileExtension, device, obj_name)
 

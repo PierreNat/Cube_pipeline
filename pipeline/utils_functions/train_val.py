@@ -1,8 +1,9 @@
 import numpy as np
 import tqdm
 import torch
+from pipeline.utils_functions.test import testResnet
 
-def train(model, train_dataloader, val_dataloader, n_epochs, loss_function, date4File, cubeSetName, batch_size, fileExtension, device):
+def train(model, train_dataloader, test_dataloader, n_epochs, loss_function, date4File, cubeSetName, batch_size, fileExtension, device):
     # monitor loss functions as the training progresses
     learning_rate = 0.01
     train_losses = []
@@ -14,8 +15,8 @@ def train(model, train_dataloader, val_dataloader, n_epochs, loss_function, date
     best_score  = 1000
     noDecreaseCount = 0
 
-    f = open("./results/{}_{}_{}_batchs_{}_epochs_{}_losses_regressionOnly.txt".format(date4File, cubeSetName, str(batch_size), str(n_epochs), fileExtension), "w+")
-    g = open("./results/{}_{}_{}_batchs_{}_epochs_{}_Rtvalues_regressionOnly.txt".format(date4File, cubeSetName, str(batch_size), str(n_epochs), fileExtension), "w+")
+    f = open("./results/Train_{}_{}_{}_batchs_{}_epochs_{}_losses_regressionOnly.txt".format(date4File, cubeSetName, str(batch_size), str(n_epochs), fileExtension), "w+")
+    g = open("./results/Train_{}_{}_{}_batchs_{}_epochs_{}_Rtvalues_regressionOnly.txt".format(date4File, cubeSetName, str(batch_size), str(n_epochs), fileExtension), "w+")
     g.write('batch angle (error in degree) translation (error in m)  \r\n')
     for epoch in range(n_epochs):
 
@@ -32,16 +33,17 @@ def train(model, train_dataloader, val_dataloader, n_epochs, loss_function, date
         losses = []  # running loss
         loop = tqdm.tqdm(train_dataloader)
         count = 0
-
+        print('train phase epoch {}'.format(epoch))
         for image, silhouette, parameter in loop:
             image = image.to(device)  # we have to send the inputs and targets at every step to the GPU too
             parameter = parameter.to(device)
+
             predicted_params = model(image)  # run prediction; output <- vector with probabilities of each class
 
 
             # zero the parameter gradients
             optimizer.zero_grad()
-            print(predicted_params.requires_grad)
+            # print(predicted_params.requires_grad)
             loss = loss_function(predicted_params, parameter) #MSE  value ?
             alpha_loss = loss_function(predicted_params[:, 0], parameter[:, 0])
             beta_loss = loss_function(predicted_params[:, 1], parameter[:, 1])
@@ -82,47 +84,13 @@ def train(model, train_dataloader, val_dataloader, n_epochs, loss_function, date
 
         train_epoch_losses.append(np.mean(np.array(losses)))  # global losses array on the way
 
-        count2 = 0
+
+
+        #test phase after the training
+        print('test phase epoch {}'.format(epoch))
         model.eval()
-        f.write('Val, run epoch: {}/{} \r\n'.format(epoch, n_epochs))
-        loop = tqdm.tqdm(val_dataloader)
-        val_epoch_score = 0 #reset score
-        for image, silhouette, parameter in loop:
-
-            image = image.to(device)  # we have to send the inputs and targets at every step to the GPU too
-            parameter = parameter.to(device)
-            predicted_params = model(image)  # run prediction; output <- vector with probabilities of each class
-
-            # zero the parameter gradients
-            optimizer.zero_grad()
-
-            loss = loss_function(predicted_params, parameter) #MSE  value ?
-
-            parameters.extend(parameter.cpu().numpy())  # append ground truth label
-            losses.append(loss.item())  # running loss
-
-            av_loss = np.mean(np.array(losses))
-            val_epoch_score += av_loss #score of this epoch
-            val_losses.append(av_loss)  # append current loss score to global losses array
-
-            print('run: {}/{} MSE val loss: {:.4f}\r\n'.format(count2, len(loop), av_loss))
-            count2 = count2 + 1
-
-        val_epoch_losses.append(np.mean(np.array(losses)))  # global losses array on the way
-        print('Mean val loss for epoch {} is {}'.format(epoch, val_epoch_score))
-
-        if val_epoch_score < best_score:   #is the validation batch loss better than previous one?
-            torch.save(model.state_dict(), './models/{}_TempModel_Best_train_{}_{}_batchs_epochs_n{}_{}__Regr.pth'.format(date4File, cubeSetName, str(batch_size), str(epoch), fileExtension))
-            print('parameters saved for epoch {}'.format(epoch))
-
-            noDecreaseCount = 0
-            best_score = val_epoch_score
-        else:                           #the validation batch loss is not better, increase counter
-            noDecreaseCount += 1
-
-        if noDecreaseCount == 5:   #if the validation loss does not deacrease after 5 epochs, lower the learning rate
-            learning_rate /= 10
-            noDecreaseCount = 0
+        test_losses, count, parameters, predicted_params = testResnet(model, test_dataloader, loss_function,
+                                                                      fileExtension, device, epoch_number=epoch)
 
     f.close()
     g.close()

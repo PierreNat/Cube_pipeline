@@ -2,7 +2,7 @@ import tqdm
 import numpy as np
 
 
-def testResnet(model, test_dataloader, loss_function, file_name_extension, device):
+def testResnet(model, test_dataloader, loss_function, file_name_extension, device, epoch_number=0):
     # monitor loss functions as the training progresses
     test_losses = []
 
@@ -11,8 +11,8 @@ def testResnet(model, test_dataloader, loss_function, file_name_extension, devic
     predicted_params = []
     losses = []  # running loss
     count = 0
-    f = open("./results/Test_result_{}_LossRegr.txt".format(file_name_extension), "w+")
-    g = open("./results/Test_result_save_param_{}_RtvaluesRegr.txt".format(file_name_extension), "w+")
+    f = open("./results/Test_result_{}_LossRegr_epoch{}.txt".format(file_name_extension, epoch_number), "w+")
+    g = open("./results/Test_result_save_param_{}_RtvaluesRegr_epoch{}.txt".format(file_name_extension, epoch_number), "w+")
     g.write('batch angle (error in degree) translation (error in m)  \r\n')
 
     loop = tqdm.tqdm(test_dataloader)

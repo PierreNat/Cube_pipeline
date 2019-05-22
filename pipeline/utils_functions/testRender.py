@@ -3,12 +3,12 @@ import numpy as np
 import torch
 from pipeline.utils_functions.renderBatchItem import renderBatchSil
 
-def testRenderResnet(model, test_dataloader, loss_function, file_name_extension, device , obj_name):
+def testRenderResnet(model, test_dataloader, loss_function, file_name_extension, device , obj_name, epoch_number = 0):
     # monitor loss functions as the training progresses
     test_losses = []
 
-    f = open("./results/Test_result_{}_LossRender.txt".format(file_name_extension), "w+")
-    g = open("./results/Test_result_save_param_{}_RtvaluesRender.txt".format(file_name_extension), "w+")
+    f = open("./results/Test_result_{}_LossRender_epoch{}.txt".format(file_name_extension, epoch_number), "w+")
+    g = open("./results/Test_result_save_param_{}_RtvaluesRender_epoch{}.txt".format(file_name_extension, epoch_number), "w+")
     g.write('batch angle (error in degree) translation (error in m)  \r\n')
 
     parameters = []  # ground truth labels
