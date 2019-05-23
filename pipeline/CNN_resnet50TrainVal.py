@@ -22,7 +22,7 @@ file_name_extension = '10000_t'  # choose the corresponding database to use
 
 batch_size = 4
 
-n_epochs = 2
+n_epochs = 5
 
 target_size = (512, 512)
 
@@ -112,8 +112,7 @@ criterion = nn.MSELoss() # define the loss (MSE, Crossentropy, Binarycrossentrop
 
 #  ------------------------------------------------------------------
 
-train_epoch_losses, all_Test_losses, Test_epoch_losses_alpha, Test_epoch_losses_beta, Test_epoch_losses_gamma, Test_epoch_losses_x, Test_epoch_losses_y, Test_epoch_losses_z =\
-    train(model, train_dataloader, test_dataloader, n_epochs, criterion, date4File, cubeSetName, batch_size, fileExtension, device)
+train_epoch_losses, all_Test_losses = train(model, train_dataloader, test_dataloader, n_epochs, criterion, date4File, cubeSetName, batch_size, fileExtension, device)
 
 #  ------------------------------------------------------------------
 

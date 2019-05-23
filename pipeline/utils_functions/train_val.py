@@ -91,6 +91,7 @@ def train(model, train_dataloader, test_dataloader, n_epochs, loss_function, dat
                     .format(count, len(loop), loss, alpha_loss, beta_loss, gamma_loss, x_loss, y_loss, z_loss))
 
             count = count + 1
+
         this_epoch_loss = np.mean(np.array(steps_losses))
         this_epoch_loss_alpha = np.mean(np.array(steps_alpha_loss))
         this_epoch_loss_beta = np.mean(np.array(steps_beta_loss))
@@ -98,18 +99,24 @@ def train(model, train_dataloader, test_dataloader, n_epochs, loss_function, dat
         this_epoch_loss_x = np.mean(np.array(steps_x_loss))
         this_epoch_loss_y = np.mean(np.array(steps_y_loss))
         this_epoch_loss_z = np.mean(np.array(steps_z_loss))
+
         train_epoch_losses.append(this_epoch_loss)  # will contain 1 loss per epoch
         epochsTrainLoss.write('loss for epoch {} global {:.4f} angle loss: {:.4f} {:.4f} {:.4f} translation loss: {:.4f} {:.4f} {:.4f}  \r\n'
                               .format(epoch, this_epoch_loss,this_epoch_loss_alpha, this_epoch_loss_beta, this_epoch_loss_gamma,
                                       this_epoch_loss_x, this_epoch_loss_y, this_epoch_loss_z))
 
+        torch.save(model.state_dict(),
+                   './models/{}_TempModel_train_{}_{}_batchs_epochs_n{}_{}_RegrOnly.pth'.format(date4File, cubeSetName,
+                                                                                            str(batch_size), str(epoch),
+                                                                                            fileExtension))
+        print('parameters saved for epoch {}'.format(epoch))
 
         #validation phase after the training
         print('test phase epoch {}'.format(epoch))
         model.eval()
-        test_losses, count, test_parameters, test_predicted_params, al, bl, gl, xl, yl, zl = testResnet(model, test_dataloader, loss_function,
+        test_losses, al, bl, gl, xl, yl, zl = testResnet(model, test_dataloader, loss_function,
                                                                       fileExtension, device, epoch_number=epoch)
-        #TODO testrenset will return 1 loss per parameter, this loss has to be store in Test_epoch_losses_x,y,z...
+
         all_Test_losses.append(test_losses)
         Test_epoch_losses_alpha.append(al)
         Test_epoch_losses_beta.append(bl)
@@ -123,4 +130,4 @@ def train(model, train_dataloader, test_dataloader, n_epochs, loss_function, dat
     epochsTrainLoss.close()
     stepsTrainLoss.close()
 
-    return train_epoch_losses, all_Test_losses, Test_epoch_losses_alpha, Test_epoch_losses_beta, Test_epoch_losses_gamma, Test_epoch_losses_x, Test_epoch_losses_y, Test_epoch_losses_z
+    return train_epoch_losses, all_Test_losses

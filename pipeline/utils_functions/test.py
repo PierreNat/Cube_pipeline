@@ -3,22 +3,20 @@ import numpy as np
 
 
 def testResnet(model, test_dataloader, loss_function, file_name_extension, device, epoch_number=0):
-    # monitor loss functions as the training progresses
-    test_losses = []
-    alpha_epoch_los = []
-    beta_epoch_loss = []
-    gamma_epoch_los = []
-    x_epoch_los = []
-    y_epoch_loss = []
-    z_epoch_los = []
+
     # test phase
     parameters = []  # ground truth labels
     predicted_params = []
     losses = []  # running loss
+
     count = 0
-    f = open("./results/Test_result_{}_LossRegr_epoch{}.txt".format(file_name_extension, epoch_number), "w+")
-    g = open("./results/Test_result_save_param_{}_RtvaluesRegr_epoch{}.txt".format(file_name_extension, epoch_number), "w+")
-    g.write('batch angle (error in degree) translation (error in m)  \r\n')
+    steps_losses = []
+    steps_alpha_loss = []
+    steps_beta_loss = []
+    steps_gamma_loss = []
+    steps_x_loss = []
+    steps_y_loss = []
+    steps_z_loss = []
 
     loop = tqdm.tqdm(test_dataloader)
     for image, silhouette, parameter in loop:
@@ -27,12 +25,10 @@ def testResnet(model, test_dataloader, loss_function, file_name_extension, devic
         parameter = parameter.to(device)
         predicted_param = model(image)  # run prediction; output <- vector with probabilities of each class
 
-
         loss = loss_function(predicted_param, parameter) #MSE  value ?
 
         parameters.extend(parameter.detach().cpu().numpy())  # append ground truth parameters [array([...], dtype=float32), [...], dtype=float32),...)]
         predicted_params.extend(predicted_param.detach().cpu().numpy()) # append computed parameters
-        losses.append(loss.item())  # running loss
 
         alpha_loss = loss_function(predicted_param[:, 0], parameter[:, 0])
         beta_loss = loss_function(predicted_param[:, 1], parameter[:, 1])
@@ -41,30 +37,22 @@ def testResnet(model, test_dataloader, loss_function, file_name_extension, devic
         y_loss = loss_function(predicted_param[:, 4], parameter[:, 4])
         z_loss = loss_function(predicted_param[:, 5], parameter[:, 5])
 
-        #store value GT(ground truth) and predicted param
-        for i in range(0, predicted_param.shape[0]):
-            g.write('{} '.format(count))
-            for j in range(0, 6):
-                estim = predicted_param[i][j].detach().cpu().numpy()
-                gt = parameter[i][j].detach().cpu().numpy()
-                if j < 3:
-                    g.write('{:.4f}° '.format(np.rad2deg(estim-gt)))
-                else:
-                    g.write('{:.4f} '.format(estim - gt))
-            g.write('\r\n')
-
-        av_loss = np.mean(np.array(losses))
-        test_losses.append(av_loss)  # global losses array on the way
-
-        # print('run: {}/{} MSE test loss: {:.4f}\r\n'.format(count, len(loop), av_loss))
-        f.write(
-            'run: {}/{} MSE train loss: {:.4f}, angle loss: {:.4f} {:.4f} {:.4f} translation loss: {:.4f} {:.4f} {:.4f}  \r\n'
-            .format(count, len(loop), av_loss, alpha_loss, beta_loss, gamma_loss, x_loss, y_loss, z_loss))
-
+        steps_losses.append(loss.item())  # only one loss value is add each step
+        steps_alpha_loss.append(alpha_loss.item())
+        steps_beta_loss.append(beta_loss.item())
+        steps_gamma_loss.append(gamma_loss.item())
+        steps_x_loss.append(x_loss.item())
+        steps_y_loss.append(y_loss.item())
+        steps_z_loss.append(z_loss.item())
         count = count + 1
-    epochTestLoss = np.mean(np.array(test_losses))
-    f.close()
-    g.close()
 
-    return test_losses, count, parameters, predicted_params, epochTestLoss
+    this_epoch_loss = np.mean(np.array(steps_losses))
+    this_epoch_loss_alpha = np.mean(np.array(steps_alpha_loss))
+    this_epoch_loss_beta = np.mean(np.array(steps_beta_loss))
+    this_epoch_loss_gamma = np.mean(np.array(steps_gamma_loss))
+    this_epoch_loss_x = np.mean(np.array(steps_x_loss))
+    this_epoch_loss_y = np.mean(np.array(steps_y_loss))
+    this_epoch_loss_z = np.mean(np.array(steps_z_loss))
+
+    return this_epoch_loss, this_epoch_loss_alpha, this_epoch_loss_beta, this_epoch_loss_gamma, this_epoch_loss_x, this_epoch_loss_y, this_epoch_loss_z
 
