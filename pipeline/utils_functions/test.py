@@ -5,7 +5,12 @@ import numpy as np
 def testResnet(model, test_dataloader, loss_function, file_name_extension, device, epoch_number=0):
     # monitor loss functions as the training progresses
     test_losses = []
-
+    alpha_epoch_los = []
+    beta_epoch_loss = []
+    gamma_epoch_los = []
+    x_epoch_los = []
+    y_epoch_loss = []
+    z_epoch_los = []
     # test phase
     parameters = []  # ground truth labels
     predicted_params = []
@@ -57,9 +62,9 @@ def testResnet(model, test_dataloader, loss_function, file_name_extension, devic
             .format(count, len(loop), av_loss, alpha_loss, beta_loss, gamma_loss, x_loss, y_loss, z_loss))
 
         count = count + 1
-
+    epochTestLoss = np.mean(np.array(test_losses))
     f.close()
     g.close()
 
-    return test_losses, count, parameters, predicted_params
+    return test_losses, count, parameters, predicted_params, epochTestLoss
 

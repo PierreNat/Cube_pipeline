@@ -72,5 +72,5 @@ def testRenderResnet(model, test_dataloader, loss_function, file_name_extension,
     f.close()
     g.close()
 
-    return test_losses, count, parameters, predict_params
+    return test_losses, count, parameters, predict_params, epochTestLoss
 

@@ -22,7 +22,7 @@ file_name_extension = '10000_t'  # choose the corresponding database to use
 
 batch_size = 4
 
-n_epochs = 4
+n_epochs = 2
 
 target_size = (512, 512)
 
@@ -30,7 +30,7 @@ cubes_file = 'Npydatabase/cubes_{}.npy'.format(file_name_extension)
 silhouettes_file = 'Npydatabase/sils_{}.npy'.format(file_name_extension)
 parameters_file = 'Npydatabase/params_{}.npy'.format(file_name_extension)
 
-fileExtension = 'TEST' #string to ad at the end of the file
+fileExtension = 'TEST2' #string to ad at the end of the file
 
 cubeSetName = 'cubes_{}'.format(file_name_extension) #used to describe the document name
 
@@ -74,8 +74,8 @@ val_dataset = CubeDataset(val_im, val_sil, val_param, transforms)
 test_dataset = CubeDataset(test_im, test_sil, test_param, transforms)
 
 
-plt.imshow(train_dataset.silhouettes[0])
-plt.show()
+# plt.imshow(train_dataset.silhouettes[0])
+# plt.show()
 
 
 #  Note:
@@ -112,7 +112,8 @@ criterion = nn.MSELoss() # define the loss (MSE, Crossentropy, Binarycrossentrop
 
 #  ------------------------------------------------------------------
 
-train_losses, all_Test_losses = train(model, train_dataloader, test_dataloader, n_epochs, criterion, date4File, cubeSetName, batch_size, fileExtension, device)
+train_epoch_losses, all_Test_losses, Test_epoch_losses_alpha, Test_epoch_losses_beta, Test_epoch_losses_gamma, Test_epoch_losses_x, Test_epoch_losses_y, Test_epoch_losses_z =\
+    train(model, train_dataloader, test_dataloader, n_epochs, criterion, date4File, cubeSetName, batch_size, fileExtension, device)
 
 #  ------------------------------------------------------------------
 
