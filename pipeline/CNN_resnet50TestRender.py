@@ -1,10 +1,15 @@
+"""
+script to train a resnet 50 network only with n epoch
+Version 4
+render is done during the computation beside the regression
+"""
 import torch
 import torch.nn as nn
 import numpy as np
 import tqdm
 import matplotlib.pyplot as plt
 
-from putils_functions.render1item import render_1_image
+from utils_functions.render1item import render_1_image
 from utils_functions.resnet50 import resnet50
 from utils_functions.testRender import testRenderResnet
 
@@ -112,7 +117,7 @@ criterion = nn.MSELoss()
 #  ------------------------------------------------------------------
 
 # test the model
-test_losses, count, parameters, predicted_params = testRenderResnet(model, test_dataloader, criterion, file_name_extension, device, obj_name)
+parameters, predicted_params, test_losses, al, bl, gl, xl, yl, zl = testRenderResnet(model, test_dataloader, criterion, file_name_extension, device, obj_name)
 
 
 #  ------------------------------------------------------------------

@@ -112,7 +112,7 @@ criterion = nn.MSELoss() # define the loss (MSE, Crossentropy, Binarycrossentrop
 
 #  ------------------------------------------------------------------
 
-train_epoch_losses, all_Test_losses = train(model, train_dataloader, test_dataloader, n_epochs, criterion, date4File, cubeSetName, batch_size, fileExtension, device)
+all_Train_losses, all_Test_losses = train(model, train_dataloader, test_dataloader, n_epochs, criterion, date4File, cubeSetName, batch_size, fileExtension, device)
 
 #  ------------------------------------------------------------------
 

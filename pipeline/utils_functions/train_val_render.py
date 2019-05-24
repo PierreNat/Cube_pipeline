@@ -1,6 +1,8 @@
+
 import numpy as np
 import tqdm
 import torch
+import torch.nn as nn
 from utils_functions.renderBatchItem import renderBatchSil
 from utils_functions.testRender import testRenderResnet
 
@@ -9,7 +11,7 @@ def train_render(model, train_dataloader, test_dataloader,
                  date4File, cubeSetName, batch_size, fileExtension, device, obj_name):
     # monitor loss functions as the training progresses
     learning_rate = 0.001
-    train_epoch_losses = []
+    all_Train_losses = []
     all_Test_losses = []
 
     Test_epoch_losses_alpha = []
@@ -38,6 +40,7 @@ def train_render(model, train_dataloader, test_dataloader,
 
         ## Training phase
         model.train()
+
         parameters = []  # ground truth labels
         predict_params = []  # predicted labels
         steps_losses = []  # contains the loss after each steps
@@ -48,7 +51,6 @@ def train_render(model, train_dataloader, test_dataloader,
         steps_y_loss = []
         steps_z_loss = []
 
-        losses = []  # running loss
         loop = tqdm.tqdm(train_dataloader)
         count = 0
         print('train phase epoch {}'.format(epoch))
@@ -78,12 +80,13 @@ def train_render(model, train_dataloader, test_dataloader,
             # object, predicted, ground truth, loss , cuda , and bool for printing logic
             loss = renderBatchSil(obj_name, predicted_params, parameter, loss_function, device, plot)
 
-            alpha_loss = loss_function(predicted_params[:, 0], parameter[:, 0])
-            beta_loss = loss_function(predicted_params[:, 1], parameter[:, 1])
-            gamma_loss = loss_function(predicted_params[:, 2], parameter[:, 2])
-            x_loss = loss_function(predicted_params[:, 3], parameter[:, 3])
-            y_loss = loss_function(predicted_params[:, 4], parameter[:, 4])
-            z_loss = loss_function(predicted_params[:, 5], parameter[:, 5])
+            #one value each for the step, compute mse loss for all parameters separately
+            alpha_loss = nn.MSELoss()(predicted_params[:, 0], parameter[:, 0])
+            beta_loss = nn.MSELoss()(predicted_params[:, 1], parameter[:, 1])
+            gamma_loss = nn.MSELoss()(predicted_params[:, 2], parameter[:, 2])
+            x_loss = nn.MSELoss()(predicted_params[:, 3], parameter[:, 3])
+            y_loss = nn.MSELoss()(predicted_params[:, 4], parameter[:, 4])
+            z_loss = nn.MSELoss()(predicted_params[:, 5], parameter[:, 5])
 
             loss.backward()  # multiple times accumulates the gradient (by addition) for each parameter
             optimizer.step()  # performs a parameter update based on the current gradient, SGD is used here
@@ -100,12 +103,12 @@ def train_render(model, train_dataloader, test_dataloader,
             steps_z_loss.append(z_loss.item())
 
             print(
-                'run: {}/{} current step loss: {:.4f}, angle loss: {:.4f} {:.4f} {:.4f} translation loss: {:.4f} {:.4f} {:.4f} '
+                'step: {}/{} current step loss: {:.4f}, angle loss: {:.4f} {:.4f} {:.4f} translation loss: {:.4f} {:.4f} {:.4f} '
                 .format(count, len(loop), loss, alpha_loss, beta_loss, gamma_loss, x_loss, y_loss, z_loss))
 
             #  save current step value for each parameter
             stepsTrainLoss.write(
-                'run: {}/{} current step loss: {:.4f}, angle loss: {:.4f} {:.4f} {:.4f} translation loss: {:.4f} {:.4f} {:.4f}  \r\n'
+                'step: {}/{} current step loss: {:.4f}, angle loss: {:.4f} {:.4f} {:.4f} translation loss: {:.4f} {:.4f} {:.4f}  \r\n'
                 .format(count, len(loop), loss, alpha_loss, beta_loss, gamma_loss, x_loss, y_loss, z_loss))
 
             count = count + 1
@@ -118,7 +121,7 @@ def train_render(model, train_dataloader, test_dataloader,
         this_epoch_loss_y = np.mean(np.array(steps_y_loss))
         this_epoch_loss_z = np.mean(np.array(steps_z_loss))
 
-        train_epoch_losses.append(this_epoch_loss)  # will contain 1 loss per epoch
+        all_Train_losses.append(this_epoch_loss)  # will contain 1 loss per epoch
 
         epochsTrainLoss.write(
             'loss for epoch {} global {:.4f} angle loss: {:.4f} {:.4f} {:.4f} translation loss: {:.4f} {:.4f} {:.4f}  \r\n'
@@ -135,7 +138,7 @@ def train_render(model, train_dataloader, test_dataloader,
         # test the model
         print('test phase epoch {}'.format(epoch))
         model.eval()
-        test_losses, al, bl, gl, xl, yl, zl = testRenderResnet(model, test_dataloader, loss_function,
+        parameters, predicted_params, test_losses, al, bl, gl, xl, yl, zl = testRenderResnet(model, test_dataloader, loss_function,
                                                                             fileExtension, device, obj_name,
                                                                             epoch_number=epoch)
         all_Test_losses.append(test_losses)
@@ -154,4 +157,4 @@ def train_render(model, train_dataloader, test_dataloader,
     epochsTrainLoss.close()
     stepsTrainLoss.close()
 
-    return train_epoch_losses, all_Test_losses
+    return all_Train_losses, all_Test_losses

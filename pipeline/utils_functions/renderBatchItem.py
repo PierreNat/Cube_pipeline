@@ -3,7 +3,7 @@ from utils_functions.render1item import render_1_sil, render_1_image
 import torch.nn as nn
 import torch
 import matplotlib.pyplot as plt
-import skfmm
+
 import numpy as np
 from torchvision.transforms import ToTensor
 

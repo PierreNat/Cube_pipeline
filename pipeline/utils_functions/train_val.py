@@ -8,7 +8,7 @@ def train(model, train_dataloader, test_dataloader, n_epochs, loss_function, dat
     # monitor loss functions as the training progresses
     learning_rate = 0.01
 
-    train_epoch_losses = []
+    all_Train_losses = []
     all_Test_losses = []
 
     Test_epoch_losses_alpha = []
@@ -60,13 +60,13 @@ def train(model, train_dataloader, test_dataloader, n_epochs, loss_function, dat
 
             loss = loss_function(predicted_params, parameter) #one MSE  value for the step
 
-            #one value each for the step
-            alpha_loss = loss_function(predicted_params[:, 0], parameter[:, 0])
-            beta_loss = loss_function(predicted_params[:, 1], parameter[:, 1])
-            gamma_loss = loss_function(predicted_params[:, 2], parameter[:, 2])
-            x_loss = loss_function(predicted_params[:, 3], parameter[:, 3])
-            y_loss = loss_function(predicted_params[:, 4], parameter[:, 4])
-            z_loss = loss_function(predicted_params[:, 5], parameter[:, 5])
+            #one value each for the step, compute mse loss for all parameters separately
+            alpha_loss = nn.MSELoss()(predicted_params[:, 0], parameter[:, 0])
+            beta_loss = nn.MSELoss()(predicted_params[:, 1], parameter[:, 1])
+            gamma_loss = nn.MSELoss()(predicted_params[:, 2], parameter[:, 2])
+            x_loss = nn.MSELoss()(predicted_params[:, 3], parameter[:, 3])
+            y_loss = nn.MSELoss()(predicted_params[:, 4], parameter[:, 4])
+            z_loss = nn.MSELoss()(predicted_params[:, 5], parameter[:, 5])
 
             loss.backward()
             optimizer.step()
@@ -83,11 +83,11 @@ def train(model, train_dataloader, test_dataloader, n_epochs, loss_function, dat
             steps_z_loss.append(z_loss.item())
 
 
-            print('run: {}/{} current step loss: {:.4f}, angle loss: {:.4f} {:.4f} {:.4f} translation loss: {:.4f} {:.4f} {:.4f} '
+            print('step: {}/{} current step loss: {:.4f}, angle loss: {:.4f} {:.4f} {:.4f} translation loss: {:.4f} {:.4f} {:.4f} '
                     .format(count, len(loop), loss, alpha_loss, beta_loss, gamma_loss, x_loss,y_loss, z_loss))
 
             #  save current step value for each parameter
-            stepsTrainLoss.write('run: {}/{} current step loss: {:.4f}, angle loss: {:.4f} {:.4f} {:.4f} translation loss: {:.4f} {:.4f} {:.4f}  \r\n'
+            stepsTrainLoss.write('step: {}/{} current step loss: {:.4f}, angle loss: {:.4f} {:.4f} {:.4f} translation loss: {:.4f} {:.4f} {:.4f}  \r\n'
                     .format(count, len(loop), loss, alpha_loss, beta_loss, gamma_loss, x_loss, y_loss, z_loss))
 
             count = count + 1
@@ -100,7 +100,7 @@ def train(model, train_dataloader, test_dataloader, n_epochs, loss_function, dat
         this_epoch_loss_y = np.mean(np.array(steps_y_loss))
         this_epoch_loss_z = np.mean(np.array(steps_z_loss))
 
-        train_epoch_losses.append(this_epoch_loss)  # will contain 1 loss per epoch
+        all_Train_losses.append(this_epoch_loss)  # will contain 1 loss per epoch
         epochsTrainLoss.write('loss for epoch {} global {:.4f} angle loss: {:.4f} {:.4f} {:.4f} translation loss: {:.4f} {:.4f} {:.4f}  \r\n'
                               .format(epoch, this_epoch_loss,this_epoch_loss_alpha, this_epoch_loss_beta, this_epoch_loss_gamma,
                                       this_epoch_loss_x, this_epoch_loss_y, this_epoch_loss_z))
@@ -114,7 +114,7 @@ def train(model, train_dataloader, test_dataloader, n_epochs, loss_function, dat
         #validation phase after the training
         print('test phase epoch {}'.format(epoch))
         model.eval()
-        test_losses, al, bl, gl, xl, yl, zl = testResnet(model, test_dataloader, loss_function,
+        parameters, predicted_params, test_losses, al, bl, gl, xl, yl, zl = testResnet(model, test_dataloader, loss_function,
                                                                       fileExtension, device, epoch_number=epoch)
 
         all_Test_losses.append(test_losses)
@@ -130,4 +130,4 @@ def train(model, train_dataloader, test_dataloader, n_epochs, loss_function, dat
     epochsTrainLoss.close()
     stepsTrainLoss.close()
 
-    return train_epoch_losses, all_Test_losses
+    return all_Train_losses, all_Test_losses

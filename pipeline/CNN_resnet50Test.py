@@ -114,8 +114,24 @@ criterion = nn.MSELoss()
 #  ------------------------------------------------------------------
 
 # test the model
-test_losses, count, parameters, predicted_params = testResnet(model, test_dataloader, criterion, file_name_extension, device)
+epochsValLoss = open(
+    "./results/TestProtocol_{}_regressionOnly.txt".format(file_name_extension), "w+")
+parameters, predicted_params, test_losses, al, bl, gl, xl, yl, zl  = testResnet(model, test_dataloader, criterion, file_name_extension, device)
 
+#TODO insestead
+# test_losses, al, bl, gl, xl, yl, zl = testResnet(model, test_dataloader, loss_function,
+#                                                  fileExtension, device, epoch_number=epoch)
+#
+# all_Test_losses.append(test_losses)
+# Test_epoch_losses_alpha.append(al)
+# Test_epoch_losses_beta.append(bl)
+# Test_epoch_losses_gamma.append(gl)
+# Test_epoch_losses_x.append(xl)
+# Test_epoch_losses_y.append(yl)
+# Test_epoch_losses_z.append(zl)
+# epochsValLoss.write(
+#     'Validation Loss for epoch {} global {:.4f} angle loss: {:.4f} {:.4f} {:.4f} translation loss: {:.4f} {:.4f} {:.4f}  \r\n'
+#     .format(epoch, test_losses, al, bl, gl, xl, yl, zl))
 
 #  ------------------------------------------------------------------
 # display computed parameter against ground truth
