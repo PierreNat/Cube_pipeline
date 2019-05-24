@@ -53,6 +53,8 @@ def train(model, train_dataloader, test_dataloader, n_epochs, loss_function, dat
 
             predicted_params = model(image)  # run prediction; output <- vector with probabilities of each class
 
+            #TODO add noise function here
+            #TODO extraction of
 
             # zero the parameter gradients
             optimizer.zero_grad()

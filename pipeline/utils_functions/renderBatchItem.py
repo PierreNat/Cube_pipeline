@@ -19,6 +19,8 @@ def renderBatchSil(Obj_Name, predicted_params, ground_Truth, loss_function, devi
         # define extrinsic parameter
         # predicted_params[i] = np.array([0, 0, 0, 2, 0.5*i, 8]) #test to enforce defined parameter
         sil_cp = render_1_sil(Obj_Name, predicted_params[i])
+
+        #TODO add noise function here
         sil_GT = render_1_sil(Obj_Name, ground_Truth[i])
         # print(torch.max(sil_cp))
         # loss += torch.sum((sil_cp - sil_GT) ** 2)
