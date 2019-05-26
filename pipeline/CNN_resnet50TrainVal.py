@@ -22,7 +22,7 @@ file_name_extension = '10000_t'  # choose the corresponding database to use
 
 batch_size = 4
 
-n_epochs = 5
+n_epochs = 10
 
 target_size = (512, 512)
 
@@ -36,7 +36,6 @@ cubeSetName = 'cubes_{}'.format(file_name_extension) #used to describe the docum
 
 date4File = '052119' #mmddyy
 
-noise = 0.1 # noise in [0,1] of the R and t ground truth values
 
 cubes = np.load(cubes_file)
 sils = np.load(silhouettes_file)
@@ -107,14 +106,15 @@ test_dataloader = DataLoader(test_dataset, batch_size=4, shuffle=False, num_work
 
 #  ------------------------------------------------------------------
 
+for noise in np.arange(0, 1, 0.1):
 
-model = resnet50(cifar=True) #use pretrained on imagenet if cifar is true
-model = model.to(device)  # transfer the neural net onto the GPU
-criterion = nn.MSELoss() # define the loss (MSE, Crossentropy, Binarycrossentropy)
+    model = resnet50(cifar=True) #use pretrained on imagenet if cifar is true
+    model = model.to(device)  # transfer the neural net onto the GPU
+    criterion = nn.MSELoss() # define the loss (MSE, Crossentropy, Binarycrossentropy)
 
-#  ------------------------------------------------------------------
+    #  ------------------------------------------------------------------
 
-all_Train_losses, all_Test_losses = train(model, train_dataloader, test_dataloader, n_epochs, criterion, date4File, cubeSetName, batch_size, fileExtension, device, noise)
+    all_Train_losses, all_Test_losses = train(model, train_dataloader, test_dataloader, n_epochs, criterion, date4File, cubeSetName, batch_size, fileExtension, device, noise)
 
 #  ------------------------------------------------------------------
 
