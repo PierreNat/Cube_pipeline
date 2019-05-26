@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 from utils_functions.test import testResnet
 
-def train(model, train_dataloader, test_dataloader, n_epochs, loss_function, date4File, cubeSetName, batch_size, fileExtension, device):
+def train(model, train_dataloader, test_dataloader, n_epochs, loss_function, date4File, cubeSetName, batch_size, fileExtension, device, noise):
     # monitor loss functions as the training progresses
     learning_rate = 0.01
 
@@ -20,11 +20,11 @@ def train(model, train_dataloader, test_dataloader, n_epochs, loss_function, dat
 
     #file creation to store final values
     #contains 1 value per epoch for global loss, alpha , beta, gamma ,x, y, z validation loss
-    epochsValLoss = open("./results/epochsValLoss_{}_{}_{}_batchs_{}_epochs_{}_regressionOnly.txt".format(date4File, cubeSetName, str(batch_size), str(n_epochs), fileExtension), "w+")
+    epochsValLoss = open("./results/epochsValLoss_{}_{}_{}_batchs{}_noise{}%_epochs_{}_regressionOnly.txt".format(date4File, cubeSetName, str(batch_size), str(n_epochs), str(noise*100), fileExtension), "w+")
     # contains 1 value per epoch for global loss, alpha , beta, gamma ,x, y, z training loss
-    epochsTrainLoss = open("./results/epochsTrainLoss_{}_{}_{}_batchs_{}_epochs_{}_regressionOnly.txt".format(date4File, cubeSetName, str(batch_size), str(n_epochs), fileExtension), "w+")
+    epochsTrainLoss = open("./results/epochsTrainLoss_{}_{}_{}_batchs{}_noise{}%_epochs_{}_regressionOnly.txt".format(date4File, cubeSetName, str(batch_size), str(noise*100), str(n_epochs), fileExtension), "w+")
     # contains n steps value for global loss, alpha , beta, gamma ,x, y, z training loss
-    stepsTrainLoss = open("./results/stepsTrainLoss_{}_{}_{}_batchs_{}_epochs_{}_regressionOnly.txt".format(date4File, cubeSetName, str(batch_size), str(n_epochs), fileExtension), "w+")
+    stepsTrainLoss = open("./results/stepsTrainLoss_{}_{}_{}_batchs{}_noise{}%_epochs_{}_regressionOnly.txt".format(date4File, cubeSetName, str(batch_size), str(noise*100), str(n_epochs), fileExtension), "w+")
 
     for epoch in range(n_epochs):
 
@@ -53,6 +53,7 @@ def train(model, train_dataloader, test_dataloader, n_epochs, loss_function, dat
 
             predicted_params = model(image)  # run prediction; output <- vector with probabilities of each class
 
+            noise = np.random.normal(0, 1, 1) # mean, sd, nbr of of element
             #TODO add noise function here
             #TODO extraction of
 

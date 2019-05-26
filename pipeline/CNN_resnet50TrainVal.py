@@ -36,6 +36,8 @@ cubeSetName = 'cubes_{}'.format(file_name_extension) #used to describe the docum
 
 date4File = '052119' #mmddyy
 
+noise = 0.1 # noise in [0,1] of the R and t ground truth values
+
 cubes = np.load(cubes_file)
 sils = np.load(silhouettes_file)
 params = np.load(parameters_file)
@@ -112,7 +114,7 @@ criterion = nn.MSELoss() # define the loss (MSE, Crossentropy, Binarycrossentrop
 
 #  ------------------------------------------------------------------
 
-all_Train_losses, all_Test_losses = train(model, train_dataloader, test_dataloader, n_epochs, criterion, date4File, cubeSetName, batch_size, fileExtension, device)
+all_Train_losses, all_Test_losses = train(model, train_dataloader, test_dataloader, n_epochs, criterion, date4File, cubeSetName, batch_size, fileExtension, device, noise)
 
 #  ------------------------------------------------------------------
 
