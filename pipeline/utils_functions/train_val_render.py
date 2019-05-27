@@ -65,6 +65,7 @@ def train_render(model, train_dataloader, test_dataloader,
             image = image.to(device)  # we have to send the inputs and targets at every step to the GPU too
             silhouette = silhouette.to(device)
 
+            #TODO change noise function, smaller noise error
             #add noise to ground truth parameter
             Gt_val = parameter.cpu().numpy()
             Gt_val[:, 0] = Gt_val[:, 0] + np.random.uniform(minRval, maxRval)*noise
