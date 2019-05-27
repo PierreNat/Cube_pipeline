@@ -5,6 +5,9 @@ import matplotlib.pyplot as plt
 
 def lossBtwSils(GT_Sils,ComputedSils, lossfunction, plot=False):
 
+
+    #NOT WORKING ANY MORE, NO GRAD INFORMATION KEPT
+
     nbrOfSil = np.shape(GT_Sils)[0]
     gt = GT_Sils #selection of ground truth segmentation
     cp = ComputedSils #selection of computed segmentation

@@ -28,16 +28,16 @@ def train(model, train_dataloader, test_dataloader, n_epochs, loss_function, dat
 
     #file creation to store final values
     #contains 1 value per epoch for global loss, alpha , beta, gamma ,x, y, z validation loss
-    epochsValLoss = open("./results/epochsValLoss_{}_{}_batchsOf{}img_{}%noise_{}epochs_regressionOnly.txt".format(date4File, cubeSetName, str(batch_size),  str(noise*100),  str(n_epochs), fileExtension), "w+")
+    epochsValLoss = open("./results/epochsValLoss_{}_{}_batchsOf{}img_{:.1f}%noise_{}epochs_regressionOnly.txt".format(date4File, cubeSetName, str(batch_size),  noise*100,  str(n_epochs), fileExtension), "w+")
     # contains 1 value per epoch for global loss, alpha , beta, gamma ,x, y, z training loss
-    epochsTrainLoss = open("./results/epochsTrainLoss_{}_{}_batchsOf{}img_{}%noise_{}epochs_regressionOnly.txt".format(date4File, cubeSetName, str(batch_size), str(noise*100), str(n_epochs), fileExtension), "w+")
+    epochsTrainLoss = open("./results/epochsTrainLoss_{}_{}_batchsOf{}img_{:.1f}%noise_{}epochs_regressionOnly.txt".format(date4File, cubeSetName, str(batch_size), noise*100, str(n_epochs), fileExtension), "w+")
     # contains n steps value for global loss, alpha , beta, gamma ,x, y, z training loss
-    stepsTrainLoss = open("./results/stepsTrainLoss_{}_{}_batchsOf{}img_{}%noise_{}epochs_regressionOnly.txt".format(date4File, cubeSetName, str(batch_size), str(noise*100), str(n_epochs), fileExtension), "w+")
+    stepsTrainLoss = open("./results/stepsTrainLoss_{}_{}_batchsOf{}img_{:.1f}%noise_{}epochs_regressionOnly.txt".format(date4File, cubeSetName, str(batch_size), noise*10, str(n_epochs), fileExtension), "w+")
 
     for epoch in range(n_epochs):
 
         optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
-        print('run epoch: {} with Lr {} and noise {}%'.format(epoch, learning_rate, str(noise*100)))
+        print('Regression run epoch: {} with Lr {} and noise {:.1f}%'.format(epoch, learning_rate, noise*100))
 
         ## Training phase
         model.train()
@@ -59,7 +59,7 @@ def train(model, train_dataloader, test_dataloader, n_epochs, loss_function, dat
             image = image.to(device)  # we have to send the inputs and targets at every step to the GPU too
 
 
-            #add noise
+            #add noise to ground truth parameter
             Gt_val = parameter.cpu().numpy()
             Gt_val[:, 0] = Gt_val[:, 0] + np.random.uniform(minRval, maxRval)*noise
             Gt_val[:, 1] = Gt_val[:, 1] + np.random.uniform(minRval, maxRval)*noise
@@ -127,8 +127,8 @@ def train(model, train_dataloader, test_dataloader, n_epochs, loss_function, dat
                                       this_epoch_loss_x, this_epoch_loss_y, this_epoch_loss_z))
 
         torch.save(model.state_dict(),
-                   './models/{}_TempModel_train_{}_batchsOf{}img_{}%noise_epochs_n{}_{}_RegrOnly.pth'.format(date4File, cubeSetName,
-                                                                                            str(batch_size), str(noise*100), str(epoch),
+                   './models/{}_TempModel_train_{}_batchsOf{}img_{:.1f}%noise_epochs_n{}_{}_RegrOnly.pth'.format(date4File, cubeSetName,
+                                                                                            str(batch_size), noise*100, str(epoch),
                                                                                             fileExtension))
         print('parameters saved for epoch {}'.format(epoch))
 

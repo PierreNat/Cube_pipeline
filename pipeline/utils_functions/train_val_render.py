@@ -8,9 +8,15 @@ from utils_functions.testRender import testRenderResnet
 
 def train_render(model, train_dataloader, test_dataloader,
                  n_epochs, loss_function,
-                 date4File, cubeSetName, batch_size, fileExtension, device, obj_name):
+                 date4File, cubeSetName, batch_size, fileExtension, device, obj_name, noise):
     # monitor loss functions as the training progresses
     learning_rate = 0.001
+    minRval = 0
+    maxRval = 0
+    minTXYval = 2
+    maxTXYval = 2
+    minTZval = 4
+    maxTZval = 14
     all_Train_losses = []
     all_Test_losses = []
 
@@ -26,17 +32,18 @@ def train_render(model, train_dataloader, test_dataloader,
 
     #file creation to store final values
     #contains 1 value per epoch for global loss, alpha , beta, gamma ,x, y, z validation loss
-    epochsValLoss = open("./results/epochsValLoss_{}_{}_{}_batchs_{}_epochs_{}_RenderRegr.txt".format(date4File, cubeSetName, str(batch_size), str(n_epochs), fileExtension), "w+")
+    epochsValLoss = open("./results/epochsValLoss_{}_{}_batchsOf{}img_{:.1f}%noise_{}epochs_RenderRegr.txt".format(date4File, cubeSetName, str(batch_size),  noise*100,  str(n_epochs), fileExtension), "w+")
     # contains 1 value per epoch for global loss, alpha , beta, gamma ,x, y, z training loss
-    epochsTrainLoss = open("./results/epochsTrainLoss_{}_{}_{}_batchs_{}_epochs_{}_RenderRegr.txt".format(date4File, cubeSetName, str(batch_size), str(n_epochs), fileExtension), "w+")
+    epochsTrainLoss = open("./results/epochsTrainLoss_{}_{}_batchsOf{}img_{:.1f}%noise_{}epochs__RenderRegr.txt".format(date4File, cubeSetName, str(batch_size), noise*100, str(n_epochs), fileExtension), "w+")
     # contains n steps value for global loss, alpha , beta, gamma ,x, y, z training loss
-    stepsTrainLoss = open("./results/stepsTrainLoss_{}_{}_{}_batchs_{}_epochs_{}_RenderRegr.txt".format(date4File, cubeSetName, str(batch_size), str(n_epochs), fileExtension), "w+")
+    stepsTrainLoss = open("./results/stepsTrainLoss_{}_{}_batchsOf{}img_{:.1f}%noise_{}epochs_RenderRegr.txt".format(date4File, cubeSetName, str(batch_size), noise*100, str(n_epochs), fileExtension), "w+")
+
 
     for epoch in range(n_epochs):
 
         optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9) #use SGD with lr update
 
-        print('run epoch: {} with Lr {}'.format(epoch, learning_rate))
+        print('RenderRegression run epoch: {} with Lr {} and noise {}%'.format(epoch, learning_rate, str(noise*100)))
 
         ## Training phase
         model.train()
@@ -57,10 +64,22 @@ def train_render(model, train_dataloader, test_dataloader,
         for image, silhouette, parameter in loop:
             image = image.to(device)  # we have to send the inputs and targets at every step to the GPU too
             silhouette = silhouette.to(device)
+
+            #add noise to ground truth parameter
+            Gt_val = parameter.cpu().numpy()
+            Gt_val[:, 0] = Gt_val[:, 0] + np.random.uniform(minRval, maxRval)*noise
+            Gt_val[:, 1] = Gt_val[:, 1] + np.random.uniform(minRval, maxRval)*noise
+            Gt_val[:, 2] = Gt_val[:, 2] + np.random.uniform(minRval, maxRval)*noise
+            Gt_val[:, 3] = Gt_val[:, 3] + np.random.uniform(minTXYval, maxTXYval)*noise
+            Gt_val[:, 4] = Gt_val[:, 4] + np.random.uniform(minTXYval, maxTXYval)*noise
+            Gt_val[:, 5] = Gt_val[:, 5] + np.random.uniform(minTZval , maxTZval)*noise
+
+            parameter = torch.from_numpy(Gt_val)
+            # Gt_val[:, 0] = Gt_val[:, 0] + np.random.normal(Gt_val[:, 0], 1, 1)
             parameter = parameter.to(device)
 
             #image has size [batch_length, 3, 512, 512]
-            #predicted_param is a tensor with torch.siye[batch, 6]
+            #predicted_param is a tensor with torch.size[batch, 6]
             predicted_params = model(image)  # run prediction; output <- vector containing  the 6 transformation params
 
             # hard reset to 0 value that we don-t want to train
@@ -128,10 +147,12 @@ def train_render(model, train_dataloader, test_dataloader,
             .format(epoch, this_epoch_loss, this_epoch_loss_alpha, this_epoch_loss_beta, this_epoch_loss_gamma,
                     this_epoch_loss_x, this_epoch_loss_y, this_epoch_loss_z))
 
+
         torch.save(model.state_dict(),
-                   './models/{}_TempModel_train_{}_{}_batchs_epochs_n{}_{}_RenderRegr.pth'.format(date4File, cubeSetName,
-                                                                                            str(batch_size), str(epoch),
+                   './models/{}_TempModel_train_{}_batchsOf{}img_{:.1f}%noise_epochs_n{}_{}_RenderRegr.pth'.format(date4File, cubeSetName,
+                                                                                            str(batch_size), noise*100, str(epoch),
                                                                                             fileExtension))
+
         print('parameters saved for epoch {}'.format(epoch))
 
         #TODO comment out the first part to see if test is done correctly
@@ -141,6 +162,7 @@ def train_render(model, train_dataloader, test_dataloader,
         parameters, predicted_params, test_losses, al, bl, gl, xl, yl, zl = testRenderResnet(model, test_dataloader, loss_function,
                                                                             fileExtension, device, obj_name,
                                                                             epoch_number=epoch)
+
         all_Test_losses.append(test_losses)
         Test_epoch_losses_alpha.append(al)
         Test_epoch_losses_beta.append(bl)

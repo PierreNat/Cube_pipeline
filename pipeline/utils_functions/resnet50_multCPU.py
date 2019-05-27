@@ -123,6 +123,7 @@ class ResNet(nn.Module):
         self.layer4 = self._make_layer(block, planes[3], layers[3], stride=2, groups=groups, norm_layer=norm_layer)
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
         self.fc = nn.Linear(planes[3] * block.expansion, num_classes)
+        self.fc = nn.DataParallel(self.fc)
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -174,15 +175,10 @@ class ResNet(nn.Module):
         x = x.view(x.size(0), -1)
         x = self.fc(x)
 
-
-        # TODO add here
-        # image = self.renderer(self.vertices, self.faces, mode='silhouettes')
-        # loss = torch.sum((image - self.image_ref[None, :, :]) ** 2)
-
         return x
 
 
-def resnet50_v2(pretrained=True, cifar = True, modelName='None', **kwargs):
+def resnet50_multCPU(pretrained=True, cifar = True, modelName='None', **kwargs):
     """Constructs a ResNet-50 model.
     Args:
         pretrained (bool): If True, returns a model pre-trained on ImageNet
