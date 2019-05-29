@@ -58,12 +58,6 @@ def train(model, train_dataloader, test_dataloader, n_epochs, loss_function, dat
         for image, silhouette, parameter in loop: #doing n steps here, depend on batch size
             image = image.to(device)  # we have to send the inputs and targets at every step to the GPU too
 
-
-            #TODO change noise function, smaller noise error
-            if noise > 0.3:         #special case for the noise in z to still have the cube inside the frame
-                noiseZ = 0.3
-            else:
-                noiseZ = noise
             #add noise to ground truth parameter
             Gt_val = parameter.cpu().numpy()
             #angle
@@ -73,7 +67,7 @@ def train(model, train_dataloader, test_dataloader, n_epochs, loss_function, dat
             #translation
             Gt_val[:, 3] = np.random.uniform(Gt_val[:, 3]-Gt_val[:, 3]*noise, Gt_val[:, 3]+Gt_val[:, 3]*noise)
             Gt_val[:, 4] = np.random.uniform(Gt_val[:, 4]-Gt_val[:, 4]*noise, Gt_val[:, 4]+Gt_val[:, 4]*noise)
-            Gt_val[:, 5] = np.random.uniform(Gt_val[:, 5]-Gt_val[:, 5]*noiseZ, Gt_val[:, 5]+Gt_val[:, 5]*noiseZ)
+            Gt_val[:, 5] = np.random.uniform(Gt_val[:, 5]-Gt_val[:, 5]*0.1, Gt_val[:, 5]+Gt_val[:, 5]*0.1)
 
             parameter = torch.from_numpy(Gt_val)
             # Gt_val[:, 0] = Gt_val[:, 0] + np.random.normal(Gt_val[:, 0], 1, 1)
