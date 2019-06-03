@@ -23,7 +23,7 @@ file_name_extension = '10000_t'  # choose the corresponding database to use
 
 batch_size = 4
 
-n_epochs = 10
+n_epochs = 15
 
 target_size = (512, 512)
 
@@ -31,11 +31,11 @@ cubes_file = 'Npydatabase/cubes_{}.npy'.format(file_name_extension)
 silhouettes_file = 'Npydatabase/sils_{}.npy'.format(file_name_extension)
 parameters_file = 'Npydatabase/params_{}.npy'.format(file_name_extension)
 
-fileExtension = 'TESTNoise' #string to ad at the end of the file
+fileExtension = 'SigmoidSmoothing' #string to ad at the end of the file
 
 cubeSetName = 'cubes_{}'.format(file_name_extension) #used to describe the document name
 
-date4File = '052719' #mmddyy
+date4File = '060319' #mmddyy
 
 
 cubes = np.load(cubes_file)

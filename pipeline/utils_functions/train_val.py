@@ -8,11 +8,12 @@ def train(model, train_dataloader, test_dataloader, n_epochs, loss_function, dat
     # monitor loss functions as the training progresses
 
     learning_rate = 0.01
+    m = nn.Sigmoid()
     minRval = 0
     maxRval = 0
-    minTXYval = 2
+    minTXYval = -2
     maxTXYval = 2
-    minTZval = 4
+    minTZval = 6
     maxTZval = 14
 
 
@@ -67,14 +68,18 @@ def train(model, train_dataloader, test_dataloader, n_epochs, loss_function, dat
             #translation
             Gt_val[:, 3] = np.random.uniform(Gt_val[:, 3]-Gt_val[:, 3]*noise, Gt_val[:, 3]+Gt_val[:, 3]*noise)
             Gt_val[:, 4] = np.random.uniform(Gt_val[:, 4]-Gt_val[:, 4]*noise, Gt_val[:, 4]+Gt_val[:, 4]*noise)
-            Gt_val[:, 5] = np.random.uniform(Gt_val[:, 5]-Gt_val[:, 5]*0.1, Gt_val[:, 5]+Gt_val[:, 5]*0.1)
+            Gt_val[:, 5] = np.random.uniform(Gt_val[:, 5]-Gt_val[:, 5]*noise, Gt_val[:, 5]+Gt_val[:, 5]*noise)
 
             parameter = torch.from_numpy(Gt_val)
-            # Gt_val[:, 0] = Gt_val[:, 0] + np.random.normal(Gt_val[:, 0], 1, 1)
             parameter = parameter.to(device)
-            predicted_params = model(image)  # run prediction; output <- vector with probabilities of each class
-
-            # noise = np.random.normal(0, 1, 1) # mean, sd, nbr of of element
+            predicted_params = model(image)  # run prediction
+            # predicted_params[:,1] = 0
+            m = nn.Sigmoid() #smooth function
+            predicted_params_Tsigmoid = m(predicted_params[:, 3:6]) #sigmoid function only on the Translation parameter of the batch
+            predicted_params[:, 3:6] = predicted_params_Tsigmoid  #create new array only for x y z value
+            val_xz = predicted_params[:, 3:5] #TODO error here don-t accept * 1 #*(maxTXYval-minTXYval) + minTXYval
+            predicted_params[:, 3:5] = val_xz  # rescale value to be between min max translation value allowed in x-y axis
+            # predicted_params[:, 5] = predicted_params[:, 5]*(maxTZval-minTZval)+minTZval         # rescale value to be at between min max translation value allowed in z axis
 
             # zero the parameter gradients
             optimizer.zero_grad()

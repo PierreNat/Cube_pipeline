@@ -15,12 +15,12 @@ torch.cuda.empty_cache()
 print(device)
 
 # choose the database to test:
-file_name_extension = '10000_t_zOnly'
+file_name_extension = '10000_t'
 
 cubes = np.load('Npydatabase/cubes_{}.npy'.format(file_name_extension))
 sils = np.load('Npydatabase/sils_{}.npy'.format(file_name_extension))
 params = np.load('Npydatabase/params_{}.npy'.format(file_name_extension))
-
+# print(np.min(params[:,4]))
 for i in range(0, 10):
     fig = plt.figure()
     img = cubes[i]
