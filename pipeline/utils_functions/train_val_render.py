@@ -15,8 +15,8 @@ def train_render(model, train_dataloader, test_dataloader,
     maxRval = 0
     minTXYval = -2
     maxTXYval = 2
-    minTZval = 7
-    maxTZval = 10
+    minTZval = 3.5
+    maxTZval = 15
     all_Train_losses = []
     all_Test_losses = []
 
@@ -28,7 +28,6 @@ def train_render(model, train_dataloader, test_dataloader,
     Test_epoch_losses_z = []
 
     plot = False #plot the running renderered batch of image
-
 
     #file creation to store final values
     #contains 1 value per epoch for global loss, alpha , beta, gamma ,x, y, z validation loss
@@ -74,7 +73,7 @@ def train_render(model, train_dataloader, test_dataloader,
             #translation
             Gt_val[:, 3] = np.random.uniform(Gt_val[:, 3]-Gt_val[:, 3]*noise, Gt_val[:, 3]+Gt_val[:, 3]*noise)
             Gt_val[:, 4] = np.random.uniform(Gt_val[:, 4]-Gt_val[:, 4]*noise, Gt_val[:, 4]+Gt_val[:, 4]*noise)
-            Gt_val[:, 5] = np.random.uniform(Gt_val[:, 5]-Gt_val[:, 5]*0.1, Gt_val[:, 5]+Gt_val[:, 5]*0.1)
+            Gt_val[:, 5] = np.random.uniform(Gt_val[:, 5]-Gt_val[:, 5]*noise, Gt_val[:, 5]+Gt_val[:, 5]*noise)
 
             parameter = torch.from_numpy(Gt_val)
             # Gt_val[:, 0] = Gt_val[:, 0] + np.random.normal(Gt_val[:, 0], 1, 1)
@@ -88,8 +87,8 @@ def train_render(model, train_dataloader, test_dataloader,
             m = nn.Sigmoid() #smooth function
             predicted_params_Tsigmoid = m(predicted_params[:, 3:6]) #sigmoid function only on the Translation parameter of the batch
             predicted_params[:, 3:6] = predicted_params_Tsigmoid  #create new array only for x y z value
-            predicted_params[:, 3:5] = predicted_params[:, 3:5]*(maxTXYval-minTXYval)+ minTXYval  # rescale value to be between min max translation value allowed in x-y axis
-            predicted_params[:, 5] = predicted_params[:, 5]*(maxTZval-minTZval)+minTZval         # rescale value to be at between min max translation value allowed in z axis
+            predicted_params[:, 3:5] =  predicted_params[:, 3:5].clone()*(maxTXYval-minTXYval) + minTXYval  # rescale value to be between min max translation value allowed in x-y axis
+            predicted_params[:, 5] = predicted_params[:, 5].clone()*(maxTZval-minTZval) + minTZval         # rescale value to be at between min max translation value allowed in z axis
 
             # hard reset to 0 value that we don-t want to train
             # zero_array = torch.zeros(4, 5)
@@ -164,7 +163,6 @@ def train_render(model, train_dataloader, test_dataloader,
 
         print('parameters saved for epoch {}'.format(epoch))
 
-        #TODO comment out the first part to see if test is done correctly
         # test the model
         print('test phase epoch {}'.format(epoch))
         model.eval()

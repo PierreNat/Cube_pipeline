@@ -25,8 +25,8 @@ def main():
     print(vertices_1.shape)
     print(faces_1.shape)
 
-    file_name_extension = '_10000_allParam'
-    nb_im = 10000
+    file_name_extension = '_10'
+    nb_im = 10
     #init and create renderer object
     R = np.array([np.radians(0), np.radians(0), np.radians(0)])  # angle in degree
     t = np.array([0, 0, 0])  # translation in meter
@@ -81,15 +81,15 @@ def main():
 
 
 
-        # if(im_nr%1 == 0):
-        #     fig = plt.figure()
-        #     fig.add_subplot(1, 2, 1)
-        #     plt.imshow(image)
-        #
-        #     fig.add_subplot(1, 2, 2)
-        #     plt.imshow(sil, cmap='gray')
-        #     plt.show()
-        #     plt.close(fig)
+        if(im_nr%1 == 0):
+            fig = plt.figure()
+            fig.add_subplot(1, 2, 1)
+            plt.imshow(image)
+
+            fig.add_subplot(1, 2, 2)
+            plt.imshow(sil, cmap='gray')
+            plt.show()
+            plt.close(fig)
 
 # save database
 # reshape in the form (nbr of image, x dim, y dim, layers)

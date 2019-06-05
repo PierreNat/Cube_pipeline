@@ -7,14 +7,14 @@ from utils_functions.test import testResnet
 def train(model, train_dataloader, test_dataloader, n_epochs, loss_function, date4File, cubeSetName, batch_size, fileExtension, device, noise):
     # monitor loss functions as the training progresses
 
-    learning_rate = 0.01
+    learning_rate = 0.001
     m = nn.Sigmoid()
     minRval = 0
     maxRval = 0
     minTXYval = -2
     maxTXYval = 2
-    minTZval = 6
-    maxTZval = 14
+    minTZval = 3.5
+    maxTZval = 15
 
 
     all_Train_losses = []
@@ -33,7 +33,7 @@ def train(model, train_dataloader, test_dataloader, n_epochs, loss_function, dat
     # contains 1 value per epoch for global loss, alpha , beta, gamma ,x, y, z training loss
     epochsTrainLoss = open("./results/epochsTrainLoss_{}_{}_batchsOf{}img_{:.1f}%noise_{}epochs_regressionOnly.txt".format(date4File, cubeSetName, str(batch_size), noise*100, str(n_epochs), fileExtension), "w+")
     # contains n steps value for global loss, alpha , beta, gamma ,x, y, z training loss
-    stepsTrainLoss = open("./results/stepsTrainLoss_{}_{}_batchsOf{}img_{:.1f}%noise_{}epochs_regressionOnly.txt".format(date4File, cubeSetName, str(batch_size), noise*10, str(n_epochs), fileExtension), "w+")
+    stepsTrainLoss = open("./results/stepsTrainLoss_{}_{}_batchsOf{}img_{:.1f}%noise_{}epochs_regressionOnly.txt".format(date4File, cubeSetName, str(batch_size), noise*100, str(n_epochs), fileExtension), "w+")
 
     for epoch in range(n_epochs):
 
@@ -77,9 +77,8 @@ def train(model, train_dataloader, test_dataloader, n_epochs, loss_function, dat
             m = nn.Sigmoid() #smooth function
             predicted_params_Tsigmoid = m(predicted_params[:, 3:6]) #sigmoid function only on the Translation parameter of the batch
             predicted_params[:, 3:6] = predicted_params_Tsigmoid  #create new array only for x y z value
-            val_xz = predicted_params[:, 3:5] #TODO error here don-t accept * 1 #*(maxTXYval-minTXYval) + minTXYval
-            predicted_params[:, 3:5] = val_xz  # rescale value to be between min max translation value allowed in x-y axis
-            # predicted_params[:, 5] = predicted_params[:, 5]*(maxTZval-minTZval)+minTZval         # rescale value to be at between min max translation value allowed in z axis
+            predicted_params[:, 3:5] = predicted_params[:, 3:5].clone()*(maxTXYval-minTXYval) + minTXYval  # rescale value to be between min max translation value allowed in x-y axis
+            predicted_params[:, 5] = predicted_params[:, 5].clone()*(maxTZval-minTZval)+minTZval         # rescale value to be at between min max translation value allowed in z axis
 
             # zero the parameter gradients
             optimizer.zero_grad()

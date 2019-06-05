@@ -35,7 +35,7 @@ fileExtension = 'SigmoidSmoothing' #string to ad at the end of the file
 
 cubeSetName = 'cubes_{}'.format(file_name_extension) #used to describe the document name
 
-date4File = '060319' #mmddyy
+date4File = '060419_{}'.format(fileExtension) #mmddyy
 
 
 cubes = np.load(cubes_file)
@@ -109,6 +109,7 @@ test_dataloader = DataLoader(test_dataset, batch_size=4, shuffle=False, num_work
 
 for noise in np.arange(0, 1, 0.1):
 
+    # noise = 0.5
     model = resnet50_multCPU(cifar=True) #use pretrained on imagenet if cifar is true
     model = model.to(device)  # transfer the neural net onto the GPU
     criterion = nn.MSELoss() # define the loss (MSE, Crossentropy, Binarycrossentropy)

@@ -15,7 +15,7 @@ torch.cuda.empty_cache()
 print(device)
 
 # choose the database to test:
-file_name_extension = '10000_t'
+file_name_extension = '_10000_allParam'
 
 cubes = np.load('Npydatabase/cubes_{}.npy'.format(file_name_extension))
 sils = np.load('Npydatabase/sils_{}.npy'.format(file_name_extension))

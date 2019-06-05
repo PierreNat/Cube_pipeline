@@ -24,7 +24,7 @@ file_name_extension = '10000_t'  # choose the corresponding database to use
 
 batch_size = 4
 
-n_epochs = 5
+n_epochs = 15
 
 target_size = (512, 512)
 
@@ -33,11 +33,11 @@ cubes_file = 'Npydatabase/cubes_{}.npy'.format(file_name_extension)
 silhouettes_file = 'Npydatabase/sils_{}.npy'.format(file_name_extension)
 parameters_file = 'Npydatabase/params_{}.npy'.format(file_name_extension)
 
-fileExtension = 'TESTNoise' #string to ad at the end of the file
+fileExtension = 'SigmoidSmooth' #string to ad at the end of the file
 
 cubeSetName = 'cubes_{}'.format(file_name_extension) #used to describe the document name
 
-date4File = '052119' #mmddyy
+date4File = '060419_{}'.format(fileExtension) #mmddyy
 
 obj_name = 'rubik_color'
 
@@ -100,18 +100,18 @@ test_dataloader = DataLoader(test_dataset, batch_size=4, shuffle=False, num_work
 
 #  ------------------------------------------------------------------
 
-for noise in np.arange(0, 1, 0.1):
+# for noise in np.arange(0, 1, 0.1):
+noise = 0.0
+model = resnet50(cifar=True) #train with the pretrained parameter from cifar database
+# model = resnet50_multCPU(cifar=True)
+model = model.to(device)  # transfer the neural net onto the GPU
+criterion = nn.MSELoss()  #nn.BCELoss()   #nn.CrossEntropyLoss()  define the loss (MSE, Crossentropy, Binarycrossentropy)
+#
+#  ------------------------------------------------------------------
 
-    model = resnet50(cifar=True) #train with the pretrained parameter from cifar database
-    # model = resnet50_multCPU(cifar=True)
-    model = model.to(device)  # transfer the neural net onto the GPU
-    criterion = nn.MSELoss()  #nn.BCELoss()   #nn.CrossEntropyLoss()  define the loss (MSE, Crossentropy, Binarycrossentropy)
-    #
-    #  ------------------------------------------------------------------
-
-    train_losses, all_Test_losses = train_render(model, train_dataloader, test_dataloader,
-                                            n_epochs, criterion,
-                                            date4File, cubeSetName, batch_size, fileExtension, device, obj_name, noise)
+train_losses, all_Test_losses = train_render(model, train_dataloader, test_dataloader,
+                                        n_epochs, criterion,
+                                        date4File, cubeSetName, batch_size, fileExtension, device, obj_name, noise)
 
 #  ------------------------------------------------------------------
 
