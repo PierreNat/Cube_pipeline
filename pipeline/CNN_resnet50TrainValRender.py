@@ -33,7 +33,7 @@ cubes_file = 'Npydatabase/cubes_{}.npy'.format(file_name_extension)
 silhouettes_file = 'Npydatabase/sils_{}.npy'.format(file_name_extension)
 parameters_file = 'Npydatabase/params_{}.npy'.format(file_name_extension)
 
-fileExtension = 'SigmoidSmooth' #string to ad at the end of the file
+fileExtension = 'Sigmoidconstr_lim7_10' #string to ad at the end of the file
 
 cubeSetName = 'cubes_{}'.format(file_name_extension) #used to describe the document name
 
@@ -101,7 +101,7 @@ test_dataloader = DataLoader(test_dataset, batch_size=4, shuffle=False, num_work
 #  ------------------------------------------------------------------
 
 # for noise in np.arange(0, 1, 0.1):
-noise = 0.0
+noise = 0.5
 model = resnet50(cifar=True) #train with the pretrained parameter from cifar database
 # model = resnet50_multCPU(cifar=True)
 model = model.to(device)  # transfer the neural net onto the GPU

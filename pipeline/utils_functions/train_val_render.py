@@ -15,8 +15,8 @@ def train_render(model, train_dataloader, test_dataloader,
     maxRval = 0
     minTXYval = -2
     maxTXYval = 2
-    minTZval = 3.5
-    maxTZval = 15
+    minTZval = 7
+    maxTZval = 10
     all_Train_losses = []
     all_Test_losses = []
 
