@@ -13,8 +13,8 @@ def train(model, train_dataloader, test_dataloader, n_epochs, loss_function, dat
     maxRval = 0
     minTXYval = -2
     maxTXYval = 2
-    minTZval = 3.5
-    maxTZval = 15
+    minTZval = 7
+    maxTZval = 10
 
 
     all_Train_losses = []
