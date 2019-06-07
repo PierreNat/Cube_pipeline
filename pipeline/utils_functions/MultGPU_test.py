@@ -1,14 +1,34 @@
 import torch
 import torchvision
 import tqdm
+import time
+import os
 import torchvision.transforms as transforms
 
 ########################################################################
 # The output of torchvision datasets are PILImage images of range [0, 1].
+
+# import pycuda
+# from pycuda import compiler
+# import pycuda.driver as drv
+#
+# drv.init()
+# print("%d device(s) found." % drv.Device.count())
+#
+# for ordinal in range(drv.Device.count()):
+#     dev = drv.Device(ordinal)
+#     print(ordinal, dev.name())
+
 # We transform them to Tensors of normalized range [-1, 1].
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+os.environ["CUDA_VISIBLE_DEVICES"] = "0,1"
+device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+
 torch.cuda.empty_cache()
 print(device)
+print('there is {} device available'.format(torch.cuda.device_count()))
+print(torch.cuda.get_device_name(device=0))
+print(torch.device)
+start_time = time.time()
 
 transform = transforms.Compose(
     [transforms.ToTensor(),
@@ -82,27 +102,33 @@ class Net(nn.Module):
         x = self.fc3(x)
         return x
 
-class NetParallel(nn.Module):
-    def __init__(self):
-        super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(3, 6, 5)
-        self.pool = nn.MaxPool2d(2, 2)
-        self.conv2 = nn.Conv2d(6, 16, 5)
-        self.fc1 = nn.Linear(16 * 5 * 5, 120)
-        self.fc2 = nn.Linear(120, 84)
-        self.block2 = nn.DataParallel(self.block2)
-        self.fc3 = nn.Linear(84, 10)
-
-    def forward(self, x):
-        x = self.pool(F.relu(self.conv1(x)))
-        x = self.pool(F.relu(self.conv2(x)))
-        x = x.view(-1, 16 * 5 * 5)
-        x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
-        x = self.fc3(x)
-        return x
+# class NetParallel(nn.Module):
+#     def __init__(self):
+#         super(NetParallel, self).__init__()
+#         self.conv1 = nn.Conv2d(3, 6, 5)
+#         self.pool = nn.MaxPool2d(2, 2)
+#         self.conv2 = nn.Conv2d(6, 16, 5)
+#         self.fc1 = nn.Linear(16 * 5 * 5, 120)
+#         self.fc2 = nn.Linear(120, 84)
+#         self.fc2 = nn.DataParallel(self.fc2)
+#         self.fc3 = nn.Linear(84, 10)
+#
+#     def forward(self, x):
+#         x = self.pool(F.relu(self.conv1(x)))
+#         x = self.pool(F.relu(self.conv2(x)))
+#         x = x.view(-1, 16 * 5 * 5)
+#         x = F.relu(self.fc1(x))
+#         x = F.relu(self.fc2(x))
+#         x = self.fc3(x)
+#         return x
 
 net = Net()
+if torch.cuda.device_count() > 1:
+  print("Let's use", torch.cuda.device_count(), "GPUs!")
+  # dim = 0 [30, xxx] -> [10, ...], [10, ...], [10, ...] on 3 GPUs
+  net = nn.DataParallel(net)
+else:
+    print("Only 1 GPU available!")
 net = net.to(device)
 
 ########################################################################
@@ -152,3 +178,4 @@ for epoch in range(2):  # loop over the dataset multiple times
             running_loss = 0.0
 
 print('Finished Training')
+print("--- %s seconds ---" % round(time.time() - start_time))
