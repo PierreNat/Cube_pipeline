@@ -2,6 +2,8 @@ import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 
+import time
+start_time = time.time()
 # Parameters and DataLoaders
 input_size = 5
 output_size = 2
@@ -56,3 +58,6 @@ for data in rand_loader:
     output = model(input)
     print("Outside: input size", input.size(),
           "output_size", output.size())
+
+print("--- %s seconds ---" % (time.time() - start_time))
+

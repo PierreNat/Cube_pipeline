@@ -20,7 +20,7 @@ def renderBatchSil(Obj_Name, predicted_params, ground_Truth, loss_function, devi
         # predicted_params[i] = np.array([0, 0, 0, 2, 0.5*i, 8]) #test to enforce defined parameter
         sil_cp = render_1_sil(Obj_Name, predicted_params[i])
 
-        #TODO add noise function here
+
         sil_GT = render_1_sil(Obj_Name, ground_Truth[i])
         # print(torch.max(sil_cp))
         # loss += torch.sum((sil_cp - sil_GT) ** 2)
@@ -42,7 +42,7 @@ def renderBatchSil(Obj_Name, predicted_params, ground_Truth, loss_function, devi
         # dist_image_tensor = torch.from_numpy(dist_image).to(device)
         # pred_dist = (sil_cp2.double()*dist_image_tensor)
         # loss += loss_function(sil_cp2, sil_GT2) + (nn.MSELoss()(pred_dist, sil_GT2.double()).float())
-
+        # TODO try a different loss for cp and gt? binary
         loss += loss_function(sil_cp2, sil_GT2) + nn.MSELoss()(predicted_params[i], ground_Truth[i]+(torch.randn(6)/10).to(device)) #compute loss and add constrain and noise
         # loss += torch.sum((sil_cp - sil_GT) ** 2)
 
