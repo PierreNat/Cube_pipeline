@@ -48,7 +48,7 @@ model = Model(input_size, output_size)
 if torch.cuda.device_count() > 1:
   print("Let's use", torch.cuda.device_count(), "GPUs!")
   # dim = 0 [30, xxx] -> [10, ...], [10, ...], [10, ...] on 3 GPUs
-  model = nn.DataParallel(model) #parallel at model level
+  model = nn.DataParallel(model)
 else:
     print("Only 1 GPU available!")
 model.to(device)
@@ -60,4 +60,3 @@ for data in rand_loader:
           "output_size", output.size())
 
 print("--- %s seconds ---" % (time.time() - start_time))
-
