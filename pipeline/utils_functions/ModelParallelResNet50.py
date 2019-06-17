@@ -39,6 +39,7 @@ class PipelineParallelResNet50(ModelParallelResNet50):
         super(PipelineParallelResNet50, self).__init__(*args, **kwargs)
         self.split_size = split_size
 
+
     def forward(self, x):
         splits = iter(x.split(self.split_size, dim=0))
         s_next = next(splits)
