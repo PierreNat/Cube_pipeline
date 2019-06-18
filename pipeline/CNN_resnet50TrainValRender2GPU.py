@@ -5,26 +5,39 @@ script to train a resnet 50 network only with n epoch
 rendering directly after each parameter estimation
 """
 import torch
+import time
 import numpy as np
 import matplotlib.pyplot as plt
 import torch.nn as nn
+
 from torch.utils.data import DataLoader
 from torchvision.transforms import ToTensor, Compose, Normalize, Lambda
-from utils_functions.resnet50 import resnet50
-from utils_functions.resnet50_multCPU import resnet50_multCPU
+from utils_functions.resnet50_2GPU import PipelineParallelResNet50
 from utils_functions.train_val_render import train_render
 from utils_functions.cubeDataset import CubeDataset
 
 # device = torch.device('cpu')
+print("Multiple GPU test render")
+print("There is", torch.cuda.device_count(), "GPUs avaiable!")
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-torch.cuda.empty_cache()
 print(device)
+dev_name0 = torch.cuda.get_device_name(device=0)
+dev_name1 = torch.cuda.get_device_name(device=0)
+print("Device 0 {}".format(dev_name0))
+print("Device 1 {}".format(dev_name1))
+
+
+device0 = torch.device('cuda:0')
+device1 = torch.device('cuda:0')
+print(device0)
+print(device1)
 
 file_name_extension = '10000_t'  # choose the corresponding database to use
 
 batch_size = 4
+batch_split = 2
 
-n_epochs = 15
+n_epochs = 1
 
 target_size = (512, 512)
 
@@ -77,6 +90,9 @@ train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True
 val_dataloader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True, num_workers=2)
 test_dataloader = DataLoader(test_dataset, batch_size=4, shuffle=False, num_workers=2)
 
+start_time = time.time()
+print("Start timer")
+
 #
 # for image, sil, param in train_dataloader:
 #
@@ -101,8 +117,10 @@ test_dataloader = DataLoader(test_dataset, batch_size=4, shuffle=False, num_work
 #  ------------------------------------------------------------------
 
 # for noise in np.arange(0, 1, 0.1):
-noise = 0.5
-model = resnet50(cifar=True) #train with the pretrained parameter from cifar database
+noise = 0.0
+model = PipelineParallelResNet50(split_size=batch_split, device0= device0, device1=device1)
+
+# model = resnet50(cifar=True) #train with the pretrained parameter from cifar database
 # model = resnet50_multCPU(cifar=True)
 model = model.to(device)  # transfer the neural net onto the GPU
 criterion = nn.MSELoss()  #nn.BCELoss()   #nn.CrossEntropyLoss()  define the loss (MSE, Crossentropy, Binarycrossentropy)
@@ -117,5 +135,6 @@ train_losses, all_Test_losses = train_render(model, train_dataloader, test_datal
 
 torch.save(model.state_dict(), 'models/{}_FinalModel_train_{}_{}_batchs_{}_epochs_{}_RenderRegr.pth'.format(date4File, cubeSetName, str(batch_size), str(n_epochs), fileExtension))
 print('parameters saved')
-
+print('Finished')
+print("--- %s seconds ---" % round(time.time() - start_time))
 #  ------------------------------------------------------------------
