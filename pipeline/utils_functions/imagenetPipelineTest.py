@@ -7,12 +7,29 @@ import torchvision.transforms as transforms
 ########################################################################
 # The output of torchvision datasets are PILImage images of range [0, 1].
 # We transform them to Tensors of normalized range [-1, 1].
+print("Multiple GPU test")
 print("There is", torch.cuda.device_count(), "GPUs avaiable!")
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+dev_name0 = torch.cuda.get_device_name(device=0)
+dev_name1 = torch.cuda.get_device_name(device=1)
+print("Device 0 {}".format(dev_name0))
+print("Device 1 {}".format(dev_name1))
 print(device)
+
+device0 = torch.device('cuda:0')
+device1 = torch.device('cuda:1')
+print(device0)
+print(device1)
 
 #print(torch.cuda.get_device_name(device))
 start_time = time.time()
+
+batchsize = 16
+split =8
+
+print("Use of {} GPU and batch size is {}".format(torch.cuda.device_count(),batchsize))
+print("split size is {}".format(split))
 
 transform = transforms.Compose(
     [transforms.ToTensor(),
@@ -20,12 +37,12 @@ transform = transforms.Compose(
 
 trainset = torchvision.datasets.CIFAR10(root='./data', train=True,
                                         download=True, transform=transform)
-trainloader = torch.utils.data.DataLoader(trainset, batch_size=4,
+trainloader = torch.utils.data.DataLoader(trainset, batch_size=batchsize,
                                           shuffle=True, num_workers=2)
 
 testset = torchvision.datasets.CIFAR10(root='./data', train=False,
                                        download=True, transform=transform)
-testloader = torch.utils.data.DataLoader(testset, batch_size=4,
+testloader = torch.utils.data.DataLoader(testset, batch_size=batchsize,
                                          shuffle=False, num_workers=2)
 
 classes = ('plane', 'car', 'bird', 'cat',
@@ -84,15 +101,14 @@ class Net(nn.Module):
         self.seq1 = nn.Sequential(
             self.conv1,
             self.relu,
-        self.pool
-        )#.to('cuda:0')
+            self.pool
+        ).to(device0)
 
         self.seq2 = nn.Sequential(
             self.conv2,
             self.relu,
             self.pool
-        ) #.to('cuda:1')
-
+        ).to(device1)
 
 
         self.fc = nn.Sequential(
@@ -101,32 +117,37 @@ class Net(nn.Module):
             self.fc2,
             self.relu,
             self.fc3
-        ) #.to('cuda:1')
+        ).to(device1)
 
     def forward(self, x):
-        x = self.seq2(self.seq1(x))
+        x = self.seq2(self.seq1(x).to(device1))
         x = x.view(-1, 16 * 5 * 5)
         x = self.fc(x)
         return x
 
-class PipelineParallelNet(Net):
-    def __init__(self, split_size=2, *args, **kwargs):
+class PipelineParallelNet(Net): # inherit from the existing Net module
+    def __init__(self, split_size=split, *args, **kwargs):
         super(PipelineParallelNet, self).__init__(*args, **kwargs)
         self.split_size = split_size
+        print(split_size)
 
     def forward(self, x):
         splits = iter(x.split(self.split_size, dim=0))
-        s_next = next(splits)
-        s_prev = self.seq1(s_next)#.to('cuda:0')
+        s_next = next(splits) #take the first mini batch
+        s_prev = self.seq1(s_next).to(device1) #go through the sequ1 with the first mini batch and the result goes in s_prev assigned with device 1
+        # print("s_prev device is {}".format(s_prev.device))
         ret = []
 
         for s_next in splits:
             # A. s_prev runs on cuda:1
+
             s_prev = self.seq2(s_prev)
             ret.append(self.fc(s_prev.view(s_prev.size(0), -1)))
 
+
             # B. s_next runs on cuda:0, which can run concurrently with A
-            s_prev = self.seq1(s_next)#.to('cuda:0')
+            s_prev = self.seq1(s_next).to(device1)
+
 
         s_prev = self.seq2(s_prev)
         ret.append(self.fc(s_prev.view(s_prev.size(0), -1)))
@@ -135,7 +156,7 @@ class PipelineParallelNet(Net):
 
 # net = Net()
 net = PipelineParallelNet()
-net = net.to(device)
+# net = net.to(device)
 
 ########################################################################
 # 3. Define a Loss function and optimizer
@@ -157,7 +178,6 @@ optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
 for epoch in range(2):  # loop over the dataset multiple times
 
-
     running_loss = 0.0
 
     loop = tqdm.tqdm(trainloader,0)
@@ -165,14 +185,14 @@ for epoch in range(2):  # loop over the dataset multiple times
     for i, data in enumerate(loop):
         # get the inputs; data is a list of [inputs, labels]
         inputs, labels = data
-        inputs= inputs.to(device)
-        labels= labels.to(device)
 
         # zero the parameter gradients
         optimizer.zero_grad()
 
         # forward + backward + optimize
-        outputs = net(inputs)
+        outputs = net(inputs.to(device0))
+        # print("Output device is {}".format(outputs.device))
+        labels = labels.to(outputs.device)
         loss = criterion(outputs, labels)
         loss.backward()
         optimizer.step()
