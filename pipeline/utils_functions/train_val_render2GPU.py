@@ -8,7 +8,8 @@ from utils_functions.testRender import testRenderResnet
 
 def train_render(model, train_dataloader, test_dataloader,
                  n_epochs, loss_function,
-                 date4File, cubeSetName, batch_size, fileExtension, device, obj_name, noise):
+                 date4File, cubeSetName, batch_size, fileExtension, device, obj_name, noise,
+                 device0, device1):
     # monitor loss functions as the training progresses
     learning_rate = 0.001
     minRval = 0
@@ -83,7 +84,7 @@ def train_render(model, train_dataloader, test_dataloader,
             #image has size [batch_length, 3, 512, 512]
             #predicted_param is a tensor with torch.size[batch, 6]
 
-            predicted_params = model(image.to('cuda:0'))  # run prediction; output <- vector containing  the 6 transformation params
+            predicted_params = model(image.to(device0))  # run prediction; output <- vector containing  the 6 transformation params
             parameter = parameter.to(predicted_params.device)
 
 
