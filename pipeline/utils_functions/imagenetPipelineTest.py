@@ -12,13 +12,13 @@ print("There is", torch.cuda.device_count(), "GPUs avaiable!")
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 dev_name0 = torch.cuda.get_device_name(device=0)
-dev_name1 = torch.cuda.get_device_name(device=1)
+dev_name1 = torch.cuda.get_device_name(device=0)
 print("Device 0 {}".format(dev_name0))
 print("Device 1 {}".format(dev_name1))
 print(device)
 
 device0 = torch.device('cuda:0')
-device1 = torch.device('cuda:1')
+device1 = torch.device('cuda:0')
 print(device0)
 print(device1)
 
