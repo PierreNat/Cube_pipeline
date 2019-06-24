@@ -28,14 +28,14 @@ print("Device 1 {}".format(dev_name1))
 
 
 device0 = torch.device('cuda:0')
-device1 = torch.device('cuda:1')
+device1 = torch.device('cuda:0')
 print(device0)
 print(device1)
 
 file_name_extension = '10000_t'  # choose the corresponding database to use
 
 batch_size = 6
-batch_split = 3
+batch_split = 3 #size of each mini batch split (not a devider)
 print("batch: {}, split: {}".format(batch_size, batch_split))
 
 n_epochs = 1
@@ -119,7 +119,7 @@ print("Start timer")
 
 # for noise in np.arange(0, 1, 0.1):
 noise = 0.0
-model = PipelineParallelResNet50(split_size=batch_split, device0= device0, device1=device1)
+model = PipelineParallelResNet50(split_size=batch_split, device0=device0, device1=device1)
 
 # model = resnet50(cifar=True) #train with the pretrained parameter from cifar database
 # model = resnet50_multCPU(cifar=True)

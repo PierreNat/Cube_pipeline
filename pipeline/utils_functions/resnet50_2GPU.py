@@ -5,7 +5,7 @@ from torchvision.models.resnet import ResNet, Bottleneck
 
 num_classes = 6
 device0 = torch.device('cuda:0')
-device1 = torch.device('cuda:1')
+device1 = torch.device('cuda:0')
 
 
 class ModelParallelResNet50(ResNet):
@@ -37,7 +37,7 @@ class ModelParallelResNet50(ResNet):
 
 
 class PipelineParallelResNet50(ModelParallelResNet50):
-    def __init__(self, split_size=1, device0='cuda:0', device1='cuda:1', *args, **kwargs):
+    def __init__(self, split_size=1, device0='cuda:0', device1='cuda:0', *args, **kwargs):
         super(PipelineParallelResNet50, self).__init__(*args, **kwargs)
         self.split_size = split_size
         self.device0 = device0
