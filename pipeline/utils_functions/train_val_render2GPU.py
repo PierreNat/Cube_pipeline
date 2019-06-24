@@ -4,7 +4,7 @@ import tqdm
 import torch
 import torch.nn as nn
 from utils_functions.renderBatchItem import renderBatchSil
-from utils_functions.testRender import testRenderResnet
+from utils_functions.testRender2GPU import testRenderResnetGPU
 
 def train_render(model, train_dataloader, test_dataloader,
                  n_epochs, loss_function,
@@ -112,6 +112,7 @@ def train_render(model, train_dataloader, test_dataloader,
             loss = renderBatchSil(obj_name, predicted_params, parameter, loss_function, device, plot)
 
             #one value each for the step, compute mse loss for all parameters separately
+            # print('alpha Loss computed with device {} and {}'.format(predicted_params.device, parameter.device))
             alpha_loss = nn.MSELoss()(predicted_params[:, 0], parameter[:, 0])
             beta_loss = nn.MSELoss()(predicted_params[:, 1], parameter[:, 1])
             gamma_loss = nn.MSELoss()(predicted_params[:, 2], parameter[:, 2])
@@ -144,6 +145,7 @@ def train_render(model, train_dataloader, test_dataloader,
 
             count = count + 1
 
+        print('training all steps finished')
         this_epoch_loss = np.mean(np.array(steps_losses))
         this_epoch_loss_alpha = np.mean(np.array(steps_alpha_loss))
         this_epoch_loss_beta = np.mean(np.array(steps_beta_loss))
@@ -170,8 +172,8 @@ def train_render(model, train_dataloader, test_dataloader,
         # test the model
         print('test phase epoch {}'.format(epoch))
         model.eval()
-        parameters, predicted_params, test_losses, al, bl, gl, xl, yl, zl = testRenderResnet(model, test_dataloader, loss_function,
-                                                                            fileExtension, device, obj_name,
+        parameters, predicted_params, test_losses, al, bl, gl, xl, yl, zl = testRenderResnetGPU(model, test_dataloader, loss_function,
+                                                                            fileExtension, device, obj_name,  device0, device1,
                                                                             epoch_number=epoch)
 
         all_Test_losses.append(test_losses)

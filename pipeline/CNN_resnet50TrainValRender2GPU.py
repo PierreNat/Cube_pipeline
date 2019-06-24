@@ -13,7 +13,7 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from torchvision.transforms import ToTensor, Compose, Normalize, Lambda
 from utils_functions.resnet50_2GPU import PipelineParallelResNet50
-from utils_functions.train_val_render import train_render
+from utils_functions.train_val_render2GPU import train_render
 from utils_functions.cubeDataset import CubeDataset
 
 # device = torch.device('cpu')
@@ -28,14 +28,15 @@ print("Device 1 {}".format(dev_name1))
 
 
 device0 = torch.device('cuda:0')
-device1 = torch.device('cuda:0')
+device1 = torch.device('cuda:1')
 print(device0)
 print(device1)
 
 file_name_extension = '10000_t'  # choose the corresponding database to use
 
-batch_size = 4
-batch_split = 2
+batch_size = 6
+batch_split = 3
+print("batch: {}, split: {}".format(batch_size, batch_split))
 
 n_epochs = 1
 
@@ -122,7 +123,7 @@ model = PipelineParallelResNet50(split_size=batch_split, device0= device0, devic
 
 # model = resnet50(cifar=True) #train with the pretrained parameter from cifar database
 # model = resnet50_multCPU(cifar=True)
-model = model.to(device)  # transfer the neural net onto the GPU
+# model = model.to(device)  # transfer the neural net onto the GPU
 criterion = nn.MSELoss()  #nn.BCELoss()   #nn.CrossEntropyLoss()  define the loss (MSE, Crossentropy, Binarycrossentropy)
 #
 #  ------------------------------------------------------------------
@@ -137,5 +138,5 @@ train_losses, all_Test_losses = train_render(model, train_dataloader, test_datal
 torch.save(model.state_dict(), 'models/{}_FinalModel_train_{}_{}_batchs_{}_epochs_{}_RenderRegr.pth'.format(date4File, cubeSetName, str(batch_size), str(n_epochs), fileExtension))
 print('parameters saved')
 print('Finished')
-print("--- %s seconds ---" % round(time.time() - start_time))
+print("--- {} minutes ---".format(round(time.time() - start_time)/60))
 #  ------------------------------------------------------------------
